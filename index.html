@@ -2,18 +2,20 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Иврит 1010 v58 - Stealth Sound</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Иврит 1010 v59 - Universal Voice</title>
 <style>
 :root { --bg: #0f172a; --card: #1e293b; --accent: #6366f1; --text: #f1f5f9; }
-body{background:var(--bg);color:var(--text);font-family:sans-serif;margin:0;display:flex;justify-content:center;height:100vh;overflow:hidden}
-#app{width:100%;max-width:420px;padding:20px;display:flex;flex-direction:column}
-.card{background:var(--card);padding:30px;border-radius:24px;border:2px solid #334155;text-align:center;margin:20px 0;flex-grow:1;display:flex;flex-direction:column;justify-content:center;cursor:pointer}
-.btn{background:var(--accent);color:white;border:none;padding:18px;border-radius:15px;font-weight:bold;cursor:pointer;width:100%;margin-bottom:10px}
-.btn-sec{background:transparent;border:1px solid #334155;color:#94a3b8;padding:12px;border-radius:12px;cursor:pointer}
-.word{font-size:48px;font-weight:800;margin:15px 0}
-.tr{font-size:22px;color:var(--accent)}
-#debug{font-size:10px;text-align:center;color:#64748b;margin-bottom:5px}
+body{background:var(--bg);color:var(--text);font-family:sans-serif;margin:0;display:flex;justify-content:center;height:100dvh;overflow:hidden}
+#app{width:100%;max-width:450px;padding:15px;display:flex;flex-direction:column;height:100%}
+.hdr-main{text-align:center;padding:10px;font-weight:800;color:var(--accent);border-bottom:1px solid #1e293b}
+.card{background:var(--card);padding:30px;border-radius:28px;border:2px solid #334155;text-align:center;margin:15px 0;flex-grow:1;display:flex;flex-direction:column;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,0.3);cursor:pointer}
+.btn{background:var(--accent);color:white;border:none;padding:20px;border-radius:18px;font-weight:bold;cursor:pointer;width:100%;font-size:16px;box-shadow:0 4px 0 #4338ca}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #4338ca}
+.btn-sec{background:transparent;border:1px solid #334155;color:#94a3b8;padding:12px;border-radius:12px;cursor:pointer;font-size:14px}
+.word{font-size:52px;font-weight:800;margin:10px 0;letter-spacing:1px}
+.tr{font-size:24px;color:var(--accent);margin-bottom:15px}
+#status-line{font-size:10px;text-align:center;margin-bottom:5px;color:#64748b;font-family:monospace}
 </style>
 </head>
 <body>
@@ -24,39 +26,41 @@ const GITHUB_REPO = "hebrew";
 let DICT = [];
 let state = { screen: 'start', words: [], idx: 0, flipped: false, files: [] };
 
-// ФИНАЛЬНЫЙ СКРЫТЫЙ МЕТОД
 function speak(text) {
+    if(!text) return;
+    const stat = document.getElementById('status-line');
+    // Очистка от огласовок (некудот)
     const cleaned = text.replace(/[\u0591-\u05C7]/g, "").trim();
-    const dbg = document.getElementById('debug');
     
-    // Удаляем старый плеер, если был
-    const old = document.getElementById('stealth-audio');
-    if(old) old.remove();
-
-    // Создаем новый плеер с обходом кэша Brave
-    const audio = document.createElement('audio');
-    audio.id = 'stealth-audio';
-    audio.src = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleaned)}&tl=iw&client=tw-ob&ttsspeed=1&ts=${Date.now()}`;
-    audio.style.display = 'none';
-    document.body.appendChild(audio);
-
+    // МЕТОД 1: Качественный Google
+    const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleaned)}&tl=iw&client=tw-ob`);
     audio.play()
-    .then(() => { if(dbg) dbg.innerText = "STATUS: PLAYING (HQ)"; })
+    .then(() => { if(stat) stat.innerText = "ENGINE: GOOGLE CLOUD (HQ)"; })
     .catch(() => {
-        if(dbg) dbg.innerText = "STATUS: BLOCKED. TRYING SYSTEM...";
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-            const utter = new SpeechSynthesisUtterance(cleaned);
-            utter.lang = 'he-IL';
-            window.speechSynthesis.speak(utter);
-        }
+        // МЕТОД 2: Резервный Microsoft/Alternative (через прокси)
+        const audio2 = new Audio(`https://translate.googleapis.com/translate_tts?client=gtx&sl=iw&tl=iw&q=${encodeURIComponent(cleaned)}`);
+        audio2.play()
+        .then(() => { if(stat) stat.innerText = "ENGINE: GOOGLE PROXY"; })
+        .catch(() => {
+            // МЕТОД 3: Системный (тот самый "мужик", если больше ничего не вышло)
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(cleaned);
+                utter.lang = 'he-IL';
+                utter.rate = 0.8;
+                window.speechSynthesis.speak(utter);
+                if(stat) stat.innerText = "ENGINE: SYSTEM LOCAL (LQ)";
+            }
+        });
     });
 }
 
 async function start() {
-    const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
-    state.files = (await res.json()).filter(f => f.name.endsWith('.txt'));
-    render();
+    try {
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
+        state.files = (await res.json()).filter(f => f.name.endsWith('.txt'));
+        render();
+    } catch(e) { alert("GitHub Offline"); }
 }
 
 async function load(url) {
@@ -66,33 +70,36 @@ async function load(url) {
         const p = line.split(';');
         return { he: p[1].trim(), tr: p[2].trim(), ru: p[3].trim() };
     });
-    state.words = DICT; state.screen = 'play'; render();
+    state.words = DICT; state.idx = 0; state.screen = 'play'; render();
 }
 
 function render() {
     const app = document.getElementById('app');
     if (state.screen === 'start') {
-        app.innerHTML = `<h2>ИВРИТ 1010</h2>` + 
-            state.files.map(f => `<button class="btn" onclick="load('${f.download_url}')">📄 ${f.name}</button>`).join('') +
-            `<button class="btn-sec" style="margin-top:20px" onclick="start()">🔄 ОБНОВИТЬ</button>`;
+        app.innerHTML = `<div class="hdr-main">ИВРИТ 1010</div><div style="flex-grow:1; overflow-y:auto; padding-top:20px">` + 
+            state.files.map(f => `<button class="btn" style="margin-bottom:15px" onclick="load('${f.download_url}')">📄 ${f.name}</button>`).join('') +
+            `</div><button class="btn-sec" onclick="start()">🔄 ОБНОВИТЬ СПИСОК</button>`;
     } else {
         const w = state.words[state.idx];
         app.innerHTML = `
-            <div id="debug">READY</div>
+            <div id="status-line">READY TO PLAY</div>
             <div class="card" onclick="state.flipped=!state.flipped;render()">
                 ${!state.flipped ? `
-                    <button class="btn" style="background:#4ade80" onclick="event.stopPropagation(); speak('${w.he}')">🔊 СЛУШАТЬ</button>
+                    <button class="btn" style="background:#22c55e; box-shadow:0 4px 0 #166534" onclick="event.stopPropagation(); speak('${w.he}')">🔊 СЛУШАТЬ</button>
                     <div class="word">${w.he}</div>
                     <div class="tr">${w.tr}</div>
                 ` : `
-                    <div class="word" style="color:#4ade80">${w.ru}</div>
+                    <div class="word" style="color:#22c55e">${w.ru}</div>
+                    <div style="color:#94a3b8; font-size:14px">Перевод</div>
                 `}
             </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
-                <button class="btn" style="background:#334155" onclick="state.idx=Math.max(0,state.idx-1);state.flipped=false;render()">⬅</button>
+                <button class="btn" style="background:#334155; box-shadow:0 4px 0 #1e293b" onclick="state.idx=Math.max(0,state.idx-1);state.flipped=false;render()">⬅</button>
                 <button class="btn" onclick="state.idx=Math.min(state.words.length-1,state.idx+1);state.flipped=false;render()">➡</button>
             </div>
-            <button class="btn-sec" style="margin-top:15px" onclick="state.screen='start';render()">НАЗАД</button>
+            <div style="text-align:center; margin-top:15px">
+                <button class="btn-sec" onclick="state.screen='start';render()">К СПИСКУ СЛОВАРЕЙ</button>
+            </div>
         `;
     }
 }
