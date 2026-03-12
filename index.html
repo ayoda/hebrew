@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v39 - Hebrew Fix</title>
+<title>🇮🇱 Иврит 1010 v40 - Dual File Audio Fix</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --text-main: #f1f5f9; --radius: 24px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -37,21 +37,18 @@ const GITHUB_REPO = "hebrew";
 let DICT = [];
 let state = { screen: 'start', currentCat: null, words: [], idx: 0, isFlipped: false, mode: 'he', q: '', availableFiles: [] };
 
-// ФУНКЦИЯ ОЧИСТКИ ТЕКСТА ОТ ОГЛАСОВОК ДЛЯ ОЗВУЧКИ
-function cleanText(text) {
-    // Удаляем некудот (диапазон символов иврита для огласовок)
-    return text.replace(/[\u0591-\u05C7]/g, "").trim();
-}
-
 function speak(text) {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     
-    // Чистим текст перед тем как "скормить" его синтезатору
-    const cleaned = cleanText(text);
+    // Мягкая очистка: удаляем только некудот, если они есть. 
+    // Если после очистки пусто - берем оригинал.
+    let cleaned = text.replace(/[\u0591-\u05C7]/g, "").trim();
+    if (!cleaned) cleaned = text;
+
     const utterance = new SpeechSynthesisUtterance(cleaned);
     utterance.lang = 'he-IL';
-    utterance.rate = 0.9;
+    utterance.rate = 0.85; // Немного замедлим для Linux Mint
     
     const voices = window.speechSynthesis.getVoices();
     const heVoice = voices.find(v => v.lang.startsWith('he'));
@@ -125,42 +122,4 @@ function render() {
             <div class="front"><div class="emoji-box">${w.icon}</div>
             <button class="btn-voice" onclick="event.stopPropagation(); speak('${w.he}')">🔊 СЛУШАТЬ</button>
             <div class="word-main">${state.mode === 'he' ? w.he : w.tr}</div>
-            <div class="word-sub">[${w.tr}]</div></div>
-            <div class="back"><div class="emoji-box">${w.icon}</div>
-            <div class="word-main" style="color:#4ade80">${w.ru}</div></div></div></div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:auto">
-            <button class="btn" style="background:#334155" onclick="changeIdx(-1)">⬅</button>
-            <button class="btn" onclick="changeIdx(1)">➡</button></div>
-            <button class="btn-sec" onclick="state.screen='cats';render()">Назад</button></div>`;
-    }
-}
-function renderSearch() {
-    const q = state.q.trim();
-    const listArea = document.getElementById('list-area');
-    const filtered = DICT.filter(w => w.he.toLowerCase().includes(q) || w.ru.toLowerCase().includes(q) || w.tr.toLowerCase().includes(q));
-    listArea.innerHTML = filtered.map(w => `<div class="search-res-card" onclick="jumpToWord('${w.he}')">
-        <div class="cat-icon" style="font-size:20px">${w.icon}</div>
-        <div class="res-info"><b>${w.he}</b> [${w.tr}]<br><small>${w.ru}</small></div></div>`).join('');
-}
-function renderCatsHtml(cats) {
-    return cats.map(c => `<div class="cat-card" onclick="openSetup('${c}')"><div class="cat-icon">${DICT.find(w => w.cat === c).icon || '📚'}</div><div>${c}</div></div>`).join('');
-}
-function jumpToWord(he) {
-    const w = DICT.find(x => x.he === he);
-    state.currentCat = w.cat; state.words = DICT.filter(x => x.cat === w.cat);
-    state.idx = state.words.findIndex(x => x.he === he);
-    state.isFlipped = false; state.screen = 'flash'; render();
-}
-function openSetup(c) { state.currentCat = c; state.screen = 'setup'; render(); }
-function startFlash() {
-    state.words = DICT.filter(w => w.cat === state.currentCat).sort(() => Math.random() - 0.5);
-    state.idx = 0; state.isFlipped = false; state.screen = 'flash'; render();
-}
-function changeIdx(delta) {
-    let n = state.idx + delta;
-    if (n >= 0 && n < state.words.length) { state.idx = n; state.isFlipped = false; render(); }
-}
-render();
-</script>
-</body>
-</html>
+            <div class="word
