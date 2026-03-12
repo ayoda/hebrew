@@ -3,15 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v35 - Ayoda Edition</title>
+<title>🇮🇱 Иврит 1010 v36 - Sound Unlocked</title>
 <style>
 :root {
-  --bg-main: #0f172a;
-  --bg-card: #1e293b;
-  --accent: #6366f1;
-  --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
-  --radius: 24px;
+  --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --text-main: #f1f5f9; --text-muted: #94a3b8; --radius: 24px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sans-serif;overflow:hidden}
@@ -21,7 +16,6 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-main);font-fami
 .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:16px}
 .scroll{flex:1;overflow-y:auto}
 .btn { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; transition: 0.3s; }
-.btn:active { transform: scale(0.98); opacity: 0.8; }
 .btn-sec { background: transparent; border: 1px solid #334155; color: var(--text-muted); padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%; }
 .dict-item { background: #1e293b; border: 1px solid rgba(99, 102, 241, 0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
 .search-input { width: 100%; padding: 16px 20px; border-radius: 15px; border: 2px solid var(--accent); background: #1e293b; color: white; font-size: 18px; outline: none; margin-bottom:15px; }
@@ -42,26 +36,32 @@ html,body{height:100%;background:var(--bg-main);color:var(--text-main);font-fami
 <div id="app"></div>
 
 <script>
-// --- КОНФИГУРАЦИЯ (Всё уже вписано, Михалыч!) ---
+// --- КОНФИГУРАЦИЯ ---
 const GITHUB_USER = "ayoda"; 
 const GITHUB_REPO = "hebrew"; 
 
 let DICT = [];
 let state = { screen: 'start', currentCat: null, words: [], idx: 0, isFlipped: false, mode: 'he', q: '', availableFiles: [] };
 
-// УЛУЧШЕННАЯ ОЗВУЧКА
+// МАКСИМАЛЬНО ЖЕСТКИЙ МЕТОД ОЗВУЧКИ
+const audioPlayer = new Audio();
+
 function speak(text) {
     if (!text) return;
     let t = text.trim();
     if (t === 'אתן') t = 'אַתֶן';
     if (t === 'את') t = 'אַת';
     
+    // Прямой вызов через API Google с принудительным обновлением
     const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(t)}&tl=iw&client=tw-ob&ttsspeed=1`;
-    const audio = new Audio();
-    audio.src = url;
-    audio.play().catch(err => {
-        console.error("Audio Play Error:", err);
-        alert("Михалыч, сначала кликни на экран, чтобы оживить звук!");
+    
+    audioPlayer.src = url;
+    audioPlayer.play().catch(e => {
+        console.error("Audio error:", e);
+        // Если заблокировано, пробуем открыть в новом окне (крайняя мера)
+        if(confirm("Браузер блокирует звук. Хочешь попробовать разблокировать его вручную?")) {
+            window.open(url, '_blank');
+        }
     });
 }
 
@@ -71,7 +71,7 @@ async function fetchFileList() {
         const files = await response.json();
         state.availableFiles = files.filter(f => f.name.endsWith('.txt'));
         render();
-    } catch (err) { alert("Ошибка: не удалось получить список файлов с GitHub"); }
+    } catch (err) { alert("Ошибка GitHub API"); }
 }
 
 async function loadFile(url) {
@@ -81,7 +81,7 @@ async function loadFile(url) {
         parseData(text);
         state.screen = 'cats';
         render();
-    } catch (err) { alert("Ошибка при чтении файла словаря"); }
+    } catch (err) { alert("Ошибка загрузки"); }
 }
 
 function parseData(content) {
@@ -102,7 +102,7 @@ function render() {
                 <h2 style="text-align:center; margin-bottom:20px">Привет, Михалыч!</h2>
                 <div id="file-list">
                     ${state.availableFiles.length === 0 
-                        ? '<button class="btn" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК С ГИТХАБА</button>' 
+                        ? '<button class="btn" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>' 
                         : state.availableFiles.map(f => `<div class="dict-item" onclick="loadFile('${f.download_url}')">📄 <b>${f.name}</b></div>`).join('')}
                 </div>
             </div>`;
@@ -110,9 +110,9 @@ function render() {
         const cats = [...new Set(DICT.map(w => w.cat))];
         app.innerHTML = `<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header>
             <div class="scr">
-                <input type="text" class="search-input" placeholder="🔍 Поиск слова..." oninput="state.q = this.value.toLowerCase(); renderSearch()" value="${state.q}">
+                <input type="text" class="search-input" placeholder="🔍 Поиск..." oninput="state.q = this.value.toLowerCase(); renderSearch()" value="${state.q}">
                 <div id="list-area" class="scroll">${state.q ? "" : renderCatsHtml(cats)}</div>
-                <button class="btn-sec" onclick="state.screen='start';render()">⬅ К списку файлов</button>
+                <button class="btn-sec" onclick="state.screen='start';render()">⬅ Назад</button>
             </div>`;
         if (state.q) renderSearch();
     } else if (state.screen === 'setup') {
