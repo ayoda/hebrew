@@ -3,14 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Иврит 1010 v54</title>
+<title>Иврит 1010 v55 - Smooth Voice</title>
 <style>
-body{background:#0f172a;color:#f1f5f9;font-family:sans-serif;display:flex;justify-content:center;margin:0}
-#app{width:100%;max-width:400px;padding:20px;text-align:center}
-.card{background:#1e293b;padding:30px;border-radius:20px;margin:20px 0;border:1px solid #334155}
-.btn{background:#6366f1;color:white;border:none;padding:15px 20px;border-radius:10px;width:100%;margin:5px 0;font-weight:bold;cursor:pointer}
-.word{font-size:40px;margin:20px 0}
-#stat{font-size:12px;color:#94a3b8;margin-bottom:10px}
+:root { --bg: #0f172a; --card: #1e293b; --accent: #6366f1; --text: #f1f5f9; }
+body{background:var(--bg);color:var(--text);font-family:sans-serif;margin:0;display:flex;justify-content:center;height:100vh;overflow:hidden}
+#app{width:100%;max-width:420px;padding:20px;display:flex;flex-direction:column}
+.card{background:var(--card);padding:30px;border-radius:24px;border:2px solid #334155;text-align:center;margin:20px 0;flex-grow:1;display:flex;flex-direction:column;justify-content:center}
+.btn{background:var(--accent);color:white;border:none;padding:18px;border-radius:15px;font-weight:bold;cursor:pointer;width:100%;margin-bottom:10px;transition:0.2s}
+.btn:active{transform:scale(0.98)}
+.btn-sec{background:transparent;border:1px solid #334155;color:#94a3b8;padding:12px;border-radius:12px;cursor:pointer}
+.word{font-size:48px;font-weight:800;margin:15px 0}
+.tr{font-size:22px;color:var(--accent);margin-bottom:10px}
+#status{font-size:11px;margin-bottom:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px}
 </style>
 </head>
 <body>
@@ -19,24 +23,40 @@ body{background:#0f172a;color:#f1f5f9;font-family:sans-serif;display:flex;justif
 const GITHUB_USER = "ayoda"; 
 const GITHUB_REPO = "hebrew"; 
 let DICT = [];
-let state = { screen: 'start', words: [], idx: 0, files: [] };
+let state = { screen: 'start', words: [], idx: 0, flipped: false, files: [] };
 
 function speak(text) {
-    const cleaned = text.replace(/[\u0591-\u05C7]/g, "").trim();
-    // Пробуем Google напрямую
-    const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleaned)}&tl=iw&client=tw-ob`);
-    audio.play().catch(() => {
-        // Если Google в бане, пробуем систему
-        const utter = new SpeechSynthesisUtterance(cleaned);
-        utter.lang = 'he-IL';
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel(); // Остановка заикания
+
+    // Очистка текста: оставляем только буквы иврита
+    const cleaned = text.replace(/[^\u05D0-\u05EA\s]/g, "").trim();
+    
+    const utter = new SpeechSynthesisUtterance(cleaned);
+    utter.lang = 'he-IL';
+    utter.rate = 0.75; // Замедляем, чтобы не частил
+    utter.pitch = 0.9; // Сделаем голос чуть мягче
+
+    // Ищем лучший голос в системе
+    const voices = window.speechSynthesis.getVoices();
+    const heVoice = voices.find(v => v.lang.includes('he') || v.lang.includes('IL'));
+    if (heVoice) utter.voice = heVoice;
+
+    // Небольшая задержка перед стартом для стабильности в Linux
+    setTimeout(() => {
         window.speechSynthesis.speak(utter);
-    });
+    }, 50);
 }
 
+// Прогрев голосов
+window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+
 async function start() {
-    const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
-    state.files = (await res.json()).filter(f => f.name.endsWith('.txt'));
-    render();
+    try {
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
+        state.files = (await res.json()).filter(f => f.name.endsWith('.txt'));
+        render();
+    } catch(e) { alert("Ошибка связи с GitHub"); }
 }
 
 async function load(url) {
@@ -46,29 +66,35 @@ async function load(url) {
         const p = line.split(';');
         return { he: p[1].trim(), tr: p[2].trim(), ru: p[3].trim() };
     });
-    state.words = DICT; state.screen = 'play'; render();
+    state.words = DICT; state.idx = 0; state.screen = 'play'; render();
 }
 
 function render() {
     const app = document.getElementById('app');
     if (state.screen === 'start') {
-        app.innerHTML = `<h2>Выбери файл:</h2>` + state.files.map(f => `<button class="btn" onclick="load('${f.download_url}')">${f.name}</button>`).join('');
+        app.innerHTML = `<h2>ИВРИТ 1010</h2><p style="margin-bottom:20px;font-size:14px;color:#94a3b8">Михалыч, выбери словарь:</p>` + 
+            state.files.map(f => `<button class="btn" onclick="load('${f.download_url}')">📄 ${f.name}</button>`).join('') +
+            `<button class="btn-sec" style="margin-top:20px" onclick="start()">🔄 Обновить список</button>`;
     } else {
         const w = state.words[state.idx];
         app.innerHTML = `
-            <div id="stat">Карточка ${state.idx + 1} из ${state.words.length}</div>
-            <div class="card">
-                <button class="btn" style="background:#4ade80" onclick="speak('${w.he}')">🔊 СЛУШАТЬ</button>
-                <div class="word">${w.he}</div>
-                <div style="color:#6366f1">${w.tr}</div>
-                <hr style="margin:20px 0; border:0; border-top:1px solid #334155">
-                <div class="word" style="color:#4ade80">${w.ru}</div>
+            <div id="status">Слово ${state.idx + 1} из ${state.words.length}</div>
+            <div class="card" onclick="state.flipped=!state.flipped;render()">
+                ${!state.flipped ? `
+                    <button class="btn" style="background:#4ade80" onclick="event.stopPropagation(); speak('${w.he}')">🔊 СЛУШАТЬ</button>
+                    <div class="word">${w.he}</div>
+                    <div class="tr">${w.tr}</div>
+                    <p style="font-size:12px;color:#64748b;margin-top:20px">Кликни на карточку, чтобы увидеть перевод</p>
+                ` : `
+                    <div class="word" style="color:#4ade80">${w.ru}</div>
+                    <p style="font-size:12px;color:#64748b">Кликни, чтобы вернуться</p>
+                `}
             </div>
-            <div style="display:flex; gap:10px">
-                <button class="btn" onclick="state.idx=Math.max(0,state.idx-1);render()">⬅</button>
-                <button class="btn" onclick="state.idx=Math.min(state.words.length-1,state.idx+1);render()">➡</button>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
+                <button class="btn" style="background:#334155" onclick="state.idx=Math.max(0,state.idx-1);state.flipped=false;render()">⬅ Назад</button>
+                <button class="btn" onclick="state.idx=Math.min(state.words.length-1,state.idx+1);state.flipped=false;render()">Далее ➡</button>
             </div>
-            <button class="btn" style="background:transparent; border:1px solid #334155" onclick="state.screen='start';state.idx=0;render()">Назад</button>
+            <button class="btn-sec" style="margin-top:15px" onclick="state.screen='start';render()">К выбору словаря</button>
         `;
     }
 }
