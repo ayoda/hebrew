@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="referrer" content="no-referrer">
-<title>🇮🇱 Иврит 1010 v37 - Final Sound Fix</title>
+<title>🇮🇱 Иврит 1010 v38 - Speech Engine</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --text-main: #f1f5f9; --radius: 24px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -39,25 +38,29 @@ const GITHUB_REPO = "hebrew";
 let DICT = [];
 let state = { screen: 'start', currentCat: null, words: [], idx: 0, isFlipped: false, mode: 'he', q: '', availableFiles: [] };
 
-// Единый плеер для всего приложения
-const player = new Audio();
-
+// НОВЫЙ ДВИЖОК ОЗВУЧКИ (Browser Engine)
 function speak(text) {
-    if (!text) return;
-    let t = text.trim();
-    if (t === 'אתן') t = 'אַתֶן';
-    if (t === 'את') t = 'אַת';
+    if (!window.speechSynthesis) {
+        alert("Твой браузер не поддерживает озвучку. Обнови его, Михалыч!");
+        return;
+    }
+    // Отменяем прошлую речь, если она еще идет
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'he-IL'; // Иврит
+    utterance.rate = 0.9;     // Чуть медленнее для четкости
     
-    // Прямая ссылка через https
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(t)}&tl=iw&client=tw-ob`;
-    
-    player.pause();
-    player.src = url;
-    player.play().catch(e => {
-        console.error("Audio block:", e);
-        alert("Михалыч, нажми на любое место экрана, чтобы браузер разрешил звук!");
-    });
+    // Пытаемся найти лучший голос иврита в системе
+    const voices = window.speechSynthesis.getVoices();
+    const heVoice = voices.find(v => v.lang.startsWith('he'));
+    if (heVoice) utterance.voice = heVoice;
+
+    window.speechSynthesis.speak(utterance);
 }
+
+// Предзагрузка голосов (нужно для некоторых браузеров)
+window.speechSynthesis.getVoices();
 
 async function fetchFileList() {
     try {
@@ -65,7 +68,7 @@ async function fetchFileList() {
         const files = await response.json();
         state.availableFiles = files.filter(f => f.name.endsWith('.txt'));
         render();
-    } catch (err) { alert("GitHub Offline"); }
+    } catch (err) { alert("GitHub API Error"); }
 }
 
 async function loadFile(url) {
@@ -75,7 +78,7 @@ async function loadFile(url) {
         parseData(text);
         state.screen = 'cats';
         render();
-    } catch (err) { alert("Load error"); }
+    } catch (err) { alert("File Load Error"); }
 }
 
 function parseData(content) {
