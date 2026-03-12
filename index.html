@@ -2,99 +2,171 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>ИВРИТ 1010 v61 - Phone Edition</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>🇮🇱 Иврит 1010 v35 - Audio Fixed</title>
 <style>
-:root { --bg: #0f172a; --card: #1e293b; --accent: #6366f1; --text: #f1f5f9; --green: #22c55e; }
-body{background:var(--bg);color:var(--text);font-family:sans-serif;margin:0;display:flex;justify-content:center;height:100dvh;overflow:hidden;touch-action:manipulation}
-#app{width:100%;max-width:450px;padding:15px;display:flex;flex-direction:column;height:100%}
-.card{background:var(--card);padding:30px;border-radius:32px;border:2px solid #334155;text-align:center;margin:15px 0;flex-grow:1;display:flex;flex-direction:column;justify-content:center;box-shadow:0 10px 40px rgba(0,0,0,0.4);cursor:pointer}
-.btn{background:var(--accent);color:white;border:none;padding:20px;border-radius:20px;font-weight:bold;cursor:pointer;width:100%;font-size:18px;box-shadow:0 5px 0 #4338ca;transition:0.1s}
-.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #4338ca}
-.word{font-size:56px;font-weight:800;margin:15px 0;letter-spacing:1px}
-.tr{font-size:26px;color:var(--accent);margin-bottom:10px}
-#engine-info{font-size:10px;text-align:center;color:#64748b;margin-bottom:5px;text-transform:uppercase}
+:root {
+  --bg-main: #0f172a;
+  --bg-card: #1e293b;
+  --accent: #6366f1;
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --radius: 24px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sans-serif;overflow:hidden}
+#app{height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column}
+.hdr{background:rgba(30,41,59,0.9);padding:15px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)}
+.hdr-title{font-size:20px;font-weight:800;color:var(--accent)}
+.scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:16px}
+.scroll{flex:1;overflow-y:auto}
+.btn { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
+.btn-sec { background: transparent; border: 1px solid #334155; color: var(--text-muted); padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%; }
+.dict-item { background: #1e293b; border: 1px solid rgba(99, 102, 241, 0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+.search-input { width: 100%; padding: 16px 20px; border-radius: 15px; border: 2px solid var(--accent); background: #1e293b; color: white; font-size: 18px; outline: none; margin-bottom:15px; }
+.cat-card, .search-res-card { background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
+.cat-icon { font-size: 24px; margin-right: 15px; background: rgba(99, 102, 241, 0.1); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+.flip-container { perspective: 1000px; width: 100%; height: 380px; margin: 10px 0; }
+.flipper { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; cursor: pointer; }
+.flipper.flipped { transform: rotateY(180deg); }
+.front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border-radius: var(--radius); border: 2px solid rgba(99, 102, 241, 0.3); padding: 20px; }
+.back { transform: rotateY(180deg); border-color: #4ade80; }
+.emoji-box { font-size: 60px; margin-bottom: 10px; }
+.word-main { font-size: 38px; font-weight: 800; text-align: center; }
+.word-sub { font-size: 18px; color: var(--accent); margin-top: 15px; text-align: center; }
+.btn-voice { background: rgba(99, 102, 241, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 50px; margin-bottom: 20px; cursor: pointer; font-weight: bold; }
 </style>
 </head>
 <body>
 <div id="app"></div>
+
 <script>
+// --- КОНФИГУРАЦИЯ ---
 const GITHUB_USER = "ayoda"; 
 const GITHUB_REPO = "hebrew"; 
+
 let DICT = [];
-let state = { screen: 'start', words: [], idx: 0, flipped: false, files: [] };
+let state = { screen: 'start', currentCat: null, words: [], idx: 0, isFlipped: false, mode: 'he', q: '', availableFiles: [] };
 
+// УЛУЧШЕННАЯ ОЗВУЧКА
 function speak(text) {
-    const info = document.getElementById('engine-info');
-    const cleaned = text.replace(/[\u0591-\u05C7]/g, "").trim();
+    if (!text) return;
+    let t = text.trim();
+    if (t === 'אתן') t = 'אַתֶן';
+    if (t === 'את') t = 'אַת';
     
-    // Пытаемся запустить качественный поток (на телефоне запоет!)
-    const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleaned)}&tl=iw&client=tw-ob`);
-    
-    audio.play()
-    .then(() => { if(info) info.innerText = "HQ VOICE ACTIVE"; })
-    .catch(() => {
-        // Если браузер (как твой Brave) блокирует - пробуем систему
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-            const utter = new SpeechSynthesisUtterance(cleaned);
-            utter.lang = 'he-IL';
-            utter.rate = 0.8;
-            window.speechSynthesis.speak(utter);
-            if(info) info.innerText = "LOCAL VOICE ACTIVE";
-        }
+    // Используем протокол https явно и добавляем метку времени, чтобы обойти кэш
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(t)}&tl=iw&client=tw-ob&ttsspeed=1`;
+    const audio = new Audio();
+    audio.src = url;
+    audio.play().catch(err => {
+        console.error("Audio Play Error:", err);
+        alert("Михалыч, кликни сначала на экран, чтобы разрешить звук!");
     });
 }
 
-async function start() {
+async function fetchFileList() {
     try {
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
-        const data = await res.json();
-        state.files = data.filter(f => f.name.endsWith('.txt'));
+        const response = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
+        const files = await response.json();
+        state.availableFiles = files.filter(f => f.name.endsWith('.txt'));
         render();
-    } catch(e) { alert("GitHub Error"); }
+    } catch (err) { alert("Ошибка списка"); }
 }
 
-async function load(url) {
-    const res = await fetch(url);
-    const text = await res.text();
-    DICT = text.split('\n').filter(l => l.includes(';')).map(line => {
+async function loadFile(url) {
+    try {
+        const response = await fetch(url);
+        const text = await response.text();
+        parseData(text);
+        state.screen = 'cats';
+        render();
+    } catch (err) { alert("Ошибка файла"); }
+}
+
+function parseData(content) {
+    const icons = { "Глаголы": "⚡", "Семья": "👪", "Дом": "🏠", "Еда": "🍎", "Тело": "💪", "Время": "📅", "Числа": "🔢", "Цвета": "🎨", "Поездки": "✈️", "Профессии": "👨‍🏫", "Туризм": "🌍" };
+    DICT = content.split('\n').filter(l => l.includes(';')).map(line => {
         const p = line.split(';');
-        return { he: p[1].trim(), tr: p[2].trim(), ru: p[3].trim() };
+        const cat = p[0].trim();
+        let icon = (p[4] && p[4].trim()) ? p[4].trim() : (icons[cat] || "📖");
+        return { cat, he: p[1].trim(), tr: p[2].trim(), ru: p[3].trim(), icon };
     });
-    state.words = DICT; state.idx = 0; state.screen = 'play'; render();
 }
 
 function render() {
     const app = document.getElementById('app');
     if (state.screen === 'start') {
-        app.innerHTML = `<h2 style="text-align:center;margin-top:20px">ИВРИТ 1010</h2><div style="flex-grow:1;overflow-y:auto;padding:10px">` + 
-            state.files.map(f => `<button class="btn" style="margin-bottom:15px" onclick="load('${f.download_url}')">📄 ${f.name}</button>`).join('') +
-            `</div>`;
-    } else {
+        app.innerHTML = `<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header>
+            <div class="scr scroll">
+                <h2 style="text-align:center; margin-bottom:20px">Привет, Михалыч!</h2>
+                <div id="file-list">
+                    ${state.availableFiles.length === 0 
+                        ? '<button class="btn" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК С ГИТХАБА</button>' 
+                        : state.availableFiles.map(f => `<div class="dict-item" onclick="loadFile('${f.download_url}')">📄 <b>${f.name}</b></div>`).join('')}
+                </div>
+            </div>`;
+    } else if (state.screen === 'cats') {
+        const cats = [...new Set(DICT.map(w => w.cat))];
+        app.innerHTML = `<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header>
+            <div class="scr">
+                <input type="text" class="search-input" placeholder="🔍 Поиск..." oninput="state.q = this.value.toLowerCase(); renderSearch()" value="${state.q}">
+                <div id="list-area" class="scroll">${state.q ? "" : renderCatsHtml(cats)}</div>
+                <button class="btn-sec" onclick="state.screen='start';render()">⬅ К списку файлов</button>
+            </div>`;
+        if (state.q) renderSearch();
+    } else if (state.screen === 'setup') {
+        app.innerHTML = `<header class="hdr"><div class="hdr-title">${state.currentCat}</div></header>
+            <div class="scr"><div style="background:var(--bg-card); padding:20px; border-radius:20px; text-align:center">
+            <button class="btn ${state.mode === 'he' ? '' : 'btn-sec'}" onclick="state.mode='he';render()">Иврит → Перевод</button>
+            <button class="btn ${state.mode === 'tr' ? '' : 'btn-sec'}" onclick="state.mode='tr';render()">Транскрипция → Перевод</button>
+            <button class="btn" style="margin-top:20px" onclick="startFlash()">ПОГНАЛИ</button>
+            <button class="btn-sec" onclick="state.screen='cats';render()">Назад</button></div></div>`;
+    } else if (state.screen === 'flash') {
         const w = state.words[state.idx];
-        app.innerHTML = `
-            <div id="engine-info">READY</div>
-            <div class="card" onclick="state.flipped=!state.flipped;render()">
-                ${!state.flipped ? `
-                    <button class="btn" style="background:var(--green);box-shadow:0 5px 0 #166534" onclick="event.stopPropagation(); speak('${w.he}')">🔊 СЛУШАТЬ</button>
-                    <div class="word">${w.he}</div>
-                    <div class="tr">${w.tr}</div>
-                    <div style="color:#64748b;font-size:12px;margin-top:20px">Нажми на карту, чтобы перевести</div>
-                ` : `
-                    <div class="word" style="color:var(--green)">${w.ru}</div>
-                    <div style="color:#64748b;font-size:14px">Перевод</div>
-                `}
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
-                <button class="btn" style="background:#334155; box-shadow:0 5px 0 #1e293b" onclick="state.idx=Math.max(0,state.idx-1);state.flipped=false;render()">⬅</button>
-                <button class="btn" onclick="state.idx=Math.min(state.words.length-1,state.idx+1);state.flipped=false;render()">➡</button>
-            </div>
-            <button onclick="state.screen='start';render()" style="background:none;border:none;color:#64748b;margin:15px;cursor:pointer;font-weight:bold">К списку словарей</button>
-        `;
+        app.innerHTML = `<header class="hdr"><div class="hdr-title">${state.currentCat}</div></header>
+            <div class="scr"><div style="text-align:center; color:var(--text-muted); mb:5px">${state.idx + 1} / ${state.words.length}</div>
+            <div class="flip-container"><div class="flipper ${state.isFlipped ? 'flipped' : ''}" onclick="state.isFlipped = !state.isFlipped; render()">
+            <div class="front"><div class="emoji-box">${w.icon}</div>
+            <button class="btn-voice" onclick="event.stopPropagation(); speak('${w.he}')">🔊 СЛУШАТЬ</button>
+            <div class="word-main">${state.mode === 'he' ? w.he : w.tr}</div>
+            <div class="word-sub">[${w.tr}]</div></div>
+            <div class="back"><div class="emoji-box">${w.icon}</div>
+            <div class="word-main" style="color:#4ade80">${w.ru}</div></div></div></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:auto">
+            <button class="btn" style="background:#334155" onclick="changeIdx(-1)">⬅</button>
+            <button class="btn" onclick="changeIdx(1)">➡</button></div>
+            <button class="btn-sec" onclick="state.screen='cats';render()">Назад</button></div>`;
     }
 }
-start();
+
+function renderSearch() {
+    const q = state.q.trim();
+    const listArea = document.getElementById('list-area');
+    const filtered = DICT.filter(w => w.he.toLowerCase().includes(q) || w.ru.toLowerCase().includes(q) || w.tr.toLowerCase().includes(q));
+    listArea.innerHTML = filtered.map(w => `<div class="search-res-card" onclick="jumpToWord('${w.he}')">
+        <div class="cat-icon" style="font-size:20px">${w.icon}</div>
+        <div class="res-info"><b>${w.he}</b> [${w.tr}]<br><small>${w.ru}</small></div></div>`).join('');
+}
+function renderCatsHtml(cats) {
+    return cats.map(c => `<div class="cat-card" onclick="openSetup('${c}')"><div class="cat-icon">${DICT.find(w => w.cat === c).icon || '📚'}</div><div>${c}</div></div>`).join('');
+}
+function jumpToWord(he) {
+    const w = DICT.find(x => x.he === he);
+    state.currentCat = w.cat; state.words = DICT.filter(x => x.cat === w.cat);
+    state.idx = state.words.findIndex(x => x.he === he);
+    state.isFlipped = false; state.screen = 'flash'; render();
+}
+function openSetup(c) { state.currentCat = c; state.screen = 'setup'; render(); }
+function startFlash() {
+    state.words = DICT.filter(w => w.cat === state.currentCat).sort(() => Math.random() - 0.5);
+    state.idx = 0; state.isFlipped = false; state.screen = 'flash'; render();
+}
+function changeIdx(delta) {
+    let n = state.idx + delta;
+    if (n >= 0 && n < state.words.length) { state.idx = n; state.isFlipped = false; render(); }
+}
+render();
 </script>
 </body>
 </html>
