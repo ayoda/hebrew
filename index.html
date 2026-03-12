@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>ИВРИТ 1010 v60 - Master Voice</title>
+<title>ИВРИТ 1010 v61 - Phone Edition</title>
 <style>
-:root { --bg: #0f172a; --card: #1e293b; --accent: #6366f1; --text: #f1f5f9; }
-body{background:var(--bg);color:var(--text);font-family:sans-serif;margin:0;display:flex;justify-content:center;height:100dvh;overflow:hidden}
+:root { --bg: #0f172a; --card: #1e293b; --accent: #6366f1; --text: #f1f5f9; --green: #22c55e; }
+body{background:var(--bg);color:var(--text);font-family:sans-serif;margin:0;display:flex;justify-content:center;height:100dvh;overflow:hidden;touch-action:manipulation}
 #app{width:100%;max-width:450px;padding:15px;display:flex;flex-direction:column;height:100%}
-.card{background:var(--card);padding:30px;border-radius:28px;border:2px solid #334155;text-align:center;margin:15px 0;flex-grow:1;display:flex;flex-direction:column;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,0.3);cursor:pointer}
-.btn{background:var(--accent);color:white;border:none;padding:18px;border-radius:18px;font-weight:bold;cursor:pointer;width:100%;font-size:16px;box-shadow:0 4px 0 #4338ca;transition:0.1s}
-.btn:active{transform:translateY(2px);box-shadow:0 0 0 #4338ca}
-.word{font-size:52px;font-weight:800;margin:10px 0;letter-spacing:1px}
-.tr{font-size:24px;color:var(--accent);margin-bottom:15px}
-#engine-tag{font-size:10px;text-align:center;color:#64748b;font-family:monospace;margin-bottom:5px}
+.card{background:var(--card);padding:30px;border-radius:32px;border:2px solid #334155;text-align:center;margin:15px 0;flex-grow:1;display:flex;flex-direction:column;justify-content:center;box-shadow:0 10px 40px rgba(0,0,0,0.4);cursor:pointer}
+.btn{background:var(--accent);color:white;border:none;padding:20px;border-radius:20px;font-weight:bold;cursor:pointer;width:100%;font-size:18px;box-shadow:0 5px 0 #4338ca;transition:0.1s}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #4338ca}
+.word{font-size:56px;font-weight:800;margin:15px 0;letter-spacing:1px}
+.tr{font-size:26px;color:var(--accent);margin-bottom:10px}
+#engine-info{font-size:10px;text-align:center;color:#64748b;margin-bottom:5px;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -24,35 +24,24 @@ const GITHUB_REPO = "hebrew";
 let DICT = [];
 let state = { screen: 'start', words: [], idx: 0, flipped: false, files: [] };
 
-let isSpeaking = false;
-
 function speak(text) {
-    if (isSpeaking) return;
-    const tag = document.getElementById('engine-tag');
+    const info = document.getElementById('engine-info');
     const cleaned = text.replace(/[\u0591-\u05C7]/g, "").trim();
     
-    isSpeaking = true;
-    
-    // МЕТОД 1: Качественный Proxy Microsoft/Google
-    const audio = new Audio();
-    audio.src = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleaned)}&tl=iw&client=tw-ob`;
-    
-    audio.onended = () => { isSpeaking = false; };
+    // Пытаемся запустить качественный поток (на телефоне запоет!)
+    const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleaned)}&tl=iw&client=tw-ob`);
     
     audio.play()
-    .then(() => { if(tag) tag.innerText = "ENGINE: HIGH-DEFINITION (ONLINE)"; })
+    .then(() => { if(info) info.innerText = "HQ VOICE ACTIVE"; })
     .catch(() => {
-        // МЕТОД 2: Резервный системный (Firefox-only fix)
+        // Если браузер (как твой Brave) блокирует - пробуем систему
         if (window.speechSynthesis) {
             window.speechSynthesis.cancel();
             const utter = new SpeechSynthesisUtterance(cleaned);
             utter.lang = 'he-IL';
-            utter.rate = 0.7; // Замедляем еще сильнее для Линукса
-            utter.onend = () => { isSpeaking = false; };
+            utter.rate = 0.8;
             window.speechSynthesis.speak(utter);
-            if(tag) tag.innerText = "ENGINE: LOCAL SYSTEM (RESERVE)";
-        } else {
-            isSpeaking = false;
+            if(info) info.innerText = "LOCAL VOICE ACTIVE";
         }
     });
 }
@@ -63,7 +52,7 @@ async function start() {
         const data = await res.json();
         state.files = data.filter(f => f.name.endsWith('.txt'));
         render();
-    } catch(e) { alert("GitHub Connection Error"); }
+    } catch(e) { alert("GitHub Error"); }
 }
 
 async function load(url) {
@@ -79,27 +68,29 @@ async function load(url) {
 function render() {
     const app = document.getElementById('app');
     if (state.screen === 'start') {
-        app.innerHTML = `<h2 style="text-align:center">ИВРИТ 1010</h2><div style="flex-grow:1; overflow-y:auto">` + 
-            state.files.map(f => `<button class="btn" style="margin-bottom:12px" onclick="load('${f.download_url}')">📄 ${f.name}</button>`).join('') +
+        app.innerHTML = `<h2 style="text-align:center;margin-top:20px">ИВРИТ 1010</h2><div style="flex-grow:1;overflow-y:auto;padding:10px">` + 
+            state.files.map(f => `<button class="btn" style="margin-bottom:15px" onclick="load('${f.download_url}')">📄 ${f.name}</button>`).join('') +
             `</div>`;
     } else {
         const w = state.words[state.idx];
         app.innerHTML = `
-            <div id="engine-tag">READY</div>
+            <div id="engine-info">READY</div>
             <div class="card" onclick="state.flipped=!state.flipped;render()">
                 ${!state.flipped ? `
-                    <button class="btn" style="background:#22c55e; box-shadow:0 4px 0 #166534" onclick="event.stopPropagation(); speak('${w.he}')">🔊 СЛУШАТЬ</button>
+                    <button class="btn" style="background:var(--green);box-shadow:0 5px 0 #166534" onclick="event.stopPropagation(); speak('${w.he}')">🔊 СЛУШАТЬ</button>
                     <div class="word">${w.he}</div>
                     <div class="tr">${w.tr}</div>
+                    <div style="color:#64748b;font-size:12px;margin-top:20px">Нажми на карту, чтобы перевести</div>
                 ` : `
-                    <div class="word" style="color:#22c55e">${w.ru}</div>
+                    <div class="word" style="color:var(--green)">${w.ru}</div>
+                    <div style="color:#64748b;font-size:14px">Перевод</div>
                 `}
             </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
-                <button class="btn" style="background:#334155; box-shadow:0 4px 0 #1e293b" onclick="state.idx=Math.max(0,state.idx-1);state.flipped=false;render()">⬅</button>
+                <button class="btn" style="background:#334155; box-shadow:0 5px 0 #1e293b" onclick="state.idx=Math.max(0,state.idx-1);state.flipped=false;render()">⬅</button>
                 <button class="btn" onclick="state.idx=Math.min(state.words.length-1,state.idx+1);state.flipped=false;render()">➡</button>
             </div>
-            <button onclick="state.screen='start';render()" style="background:none; border:none; color:#64748b; margin-top:15px; cursor:pointer">К выбору словаря</button>
+            <button onclick="state.screen='start';render()" style="background:none;border:none;color:#64748b;margin:15px;cursor:pointer;font-weight:bold">К списку словарей</button>
         `;
     }
 }
