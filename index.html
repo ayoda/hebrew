@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v48 - Engine Check</title>
+<title>🇮🇱 Иврит 1010 v50 - External Engine</title>
+<script src="https://code.responsivevoice.org/responsivevoice.js?key=8p9C7F5G"></script>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --text-main: #f1f5f9; --radius: 24px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -23,7 +24,6 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
 .back { transform: rotateY(180deg); border-color: #4ade80; }
 .word-main { font-size: 38px; font-weight: 800; text-align: center; }
 .btn-voice { background: rgba(99, 102, 241, 0.2); border: 2px solid var(--accent); color: white; padding: 15px 30px; border-radius: 50px; margin-bottom: 20px; cursor: pointer; font-weight: bold; }
-#debug-log { font-size: 10px; color: #ef4444; margin-top: 10px; text-align: center; }
 </style>
 </head>
 <body>
@@ -32,45 +32,22 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
 const GITHUB_USER = "ayoda"; 
 const GITHUB_REPO = "hebrew"; 
 let DICT = [];
-let state = { screen: 'start', currentCat: null, words: [], idx: 0, isFlipped: false, mode: 'he', q: '', availableFiles: [] };
+let state = { screen: 'start', currentCat: null, words: [], idx: 0, isFlipped: false, mode: 'he', availableFiles: [] };
 
-function log(msg) {
-    const el = document.getElementById('debug-log');
-    if(el) el.innerText = "Статус: " + msg;
-}
-
+// НОВЫЙ МЕТОД v50: Используем ResponsiveVoice
 function speak(text) {
-    if (!window.speechSynthesis) {
-        log("Браузер не поддерживает голос");
-        return;
-    }
-    window.speechSynthesis.cancel();
-    
+    if (!text) return;
     const cleaned = text.replace(/[\u0591-\u05C7]/g, "").trim();
-    const utter = new SpeechSynthesisUtterance(cleaned);
     
-    // Пытаемся принудительно найти иврит
-    const voices = window.speechSynthesis.getVoices();
-    const heVoice = voices.find(v => v.lang.includes('he') || v.lang.includes('iw'));
-    
-    if (heVoice) {
-        utter.voice = heVoice;
-        log("Использую голос: " + heVoice.name);
+    // Проверяем, загружена ли библиотека
+    if (typeof responsiveVoice !== 'undefined') {
+        responsiveVoice.speak(cleaned, "Hebrew Male", {pitch: 1, rate: 0.9});
     } else {
-        log("Голос иврита не найден в системе! Доступно голосов: " + voices.length);
+        // Если библиотека не прогрузилась, пробуем старый метод
+        const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleaned)}&tl=iw&client=tw-ob`);
+        audio.play();
     }
-
-    utter.onstart = () => log("Воспроизведение...");
-    utter.onerror = (e) => log("Ошибка синтеза: " + e.error);
-    
-    window.speechSynthesis.speak(utter);
 }
-
-// Прогрев голосов
-window.speechSynthesis.onvoiceschanged = () => {
-    const v = window.speechSynthesis.getVoices();
-    console.log("Голоса загружены:", v.length);
-};
 
 async function fetchFileList() {
     try {
@@ -88,11 +65,11 @@ async function loadFile(url) {
         parseData(text);
         state.screen = 'cats';
         render();
-    } catch (err) { alert("Load Error"); }
+    } catch (err) { alert("File Error"); }
 }
 
 function parseData(content) {
-    const icons = { "Глаголы": "⚡", "Семья": "👪", "Дом": "🏠", "Еда": "🍎", "Тело": "💪", "Время": "📅", "Числа": "🔢", "Цвета": "🎨", "Поездки": "✈️", "Профессии": "👨‍🏫" };
+    const icons = { "Глаголы": "⚡", "Семья": "👪", "Дом": "🏠", "Еда": "🍎", "Тело": "💪", "Время": "📅", "Числа": "🔢", "Цвета": "🎨" };
     DICT = content.split('\n').filter(l => l.includes(';')).map(line => {
         const p = line.split(';');
         const cat = p[0].trim();
@@ -115,11 +92,9 @@ function render() {
         app.innerHTML = `<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header>
             <div class="scr scroll">
                 ${cats.map(c => `<div class="dict-item" onclick="state.currentCat='${c}';state.screen='setup';render()">📚 ${c}</div>`).join('')}
-                <button class="btn-sec" onclick="state.screen='start';render()">⬅ Назад</button>
             </div>`;
     } else if (state.screen === 'setup') {
-        app.innerHTML = `<header class="hdr"><div class="hdr-title">${state.currentCat}</div></header>
-            <div class="scr" style="justify-content:center">
+        app.innerHTML = `<div class="scr" style="justify-content:center">
                 <button class="btn" onclick="state.words=DICT.filter(w=>w.cat===state.currentCat).sort(()=>Math.random()-0.5); state.idx=0; state.screen='flash'; render()">ПОГНАЛИ</button>
                 <button class="btn-sec" onclick="state.screen='cats';render()">Назад</button>
             </div>`;
@@ -141,8 +116,6 @@ function render() {
                     <button class="btn" style="background:#334155" onclick="state.idx=Math.max(0,state.idx-1);render()">⬅</button>
                     <button class="btn" onclick="state.idx=Math.min(state.words.length-1,state.idx+1);render()">➡</button>
                 </div>
-                <div id="debug-log"></div>
-                <button class="btn-sec" onclick="state.screen='cats';render()">Назад</button>
             </div>`;
     }
 }
