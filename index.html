@@ -2,20 +2,15 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v53 - THE FINAL STAND</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Иврит 1010 v54</title>
 <style>
-:root { --bg: #0f172a; --card: #1e293b; --accent: #6366f1; --text: #f1f5f9; }
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:sans-serif;overflow:hidden;height:100vh}
-#app{max-width:480px;margin:0 auto;display:flex;flex-direction:column;height:100%}
-.scr{flex:1;padding:20px;display:flex;flex-direction:column;overflow-y:auto}
-.btn{background:var(--accent);color:white;border:none;padding:18px;border-radius:15px;font-weight:700;cursor:pointer;width:100%;margin-bottom:10px}
-.btn-sec{background:transparent;border:1px solid #334155;color:#94a3b8;padding:15px;border-radius:15px;cursor:pointer;width:100%}
-.card{background:var(--card);border-radius:24px;padding:30px;text-align:center;border:2px solid #334155;min-height:300px;display:flex;flex-direction:column;justify-content:center;cursor:pointer}
-.word{font-size:45px;font-weight:800;margin:20px 0}
-.tr{font-size:20px;color:var(--accent)}
-#status{font-size:12px;text-align:center;margin:10px;padding:5px;border-radius:5px}
+body{background:#0f172a;color:#f1f5f9;font-family:sans-serif;display:flex;justify-content:center;margin:0}
+#app{width:100%;max-width:400px;padding:20px;text-align:center}
+.card{background:#1e293b;padding:30px;border-radius:20px;margin:20px 0;border:1px solid #334155}
+.btn{background:#6366f1;color:white;border:none;padding:15px 20px;border-radius:10px;width:100%;margin:5px 0;font-weight:bold;cursor:pointer}
+.word{font-size:40px;margin:20px 0}
+#stat{font-size:12px;color:#94a3b8;margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -24,32 +19,18 @@ body{background:var(--bg);color:var(--text);font-family:sans-serif;overflow:hidd
 const GITHUB_USER = "ayoda"; 
 const GITHUB_REPO = "hebrew"; 
 let DICT = [];
-let state = { screen: 'start', words: [], idx: 0, flipped: false, files: [] };
+let state = { screen: 'start', words: [], idx: 0, files: [] };
 
-// УЛЬТИМАТИВНЫЙ МЕТОД ОЗВУЧКИ
 function speak(text) {
-    const status = document.getElementById('status');
     const cleaned = text.replace(/[\u0591-\u05C7]/g, "").trim();
-    
-    // Попытка 1: Системный голос
-    if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
+    // Пробуем Google напрямую
+    const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleaned)}&tl=iw&client=tw-ob`);
+    audio.play().catch(() => {
+        // Если Google в бане, пробуем систему
         const utter = new SpeechSynthesisUtterance(cleaned);
         utter.lang = 'he-IL';
-        utter.onstart = () => { status.innerText = "🔊 Играет система"; status.style.background = "#064e3b"; };
-        utter.onerror = () => { status.innerText = "❌ Системный сбой"; status.style.background = "#7f1d1d"; tryGoogle(cleaned); };
         window.speechSynthesis.speak(utter);
-    } else {
-        tryGoogle(cleaned);
-    }
-}
-
-function tryGoogle(t) {
-    const status = document.getElementById('status');
-    const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(t)}&tl=iw&client=tw-ob`);
-    audio.play()
-        .then(() => { status.innerText = "🔊 Играет Google"; status.style.background = "#1e3a8a"; })
-        .catch(() => { status.innerText = "🚫 ВСЁ ЗАБЛОКИРОВАНО"; status.style.background = "#450a0a"; });
+    });
 }
 
 async function start() {
@@ -63,42 +44,32 @@ async function load(url) {
     const text = await res.text();
     DICT = text.split('\n').filter(l => l.includes(';')).map(line => {
         const p = line.split(';');
-        return { cat: p[0].trim(), he: p[1].trim(), tr: p[2].trim(), ru: p[3].trim() };
+        return { he: p[1].trim(), tr: p[2].trim(), ru: p[3].trim() };
     });
-    state.screen = 'cats';
-    render();
+    state.words = DICT; state.screen = 'play'; render();
 }
 
 function render() {
     const app = document.getElementById('app');
     if (state.screen === 'start') {
-        app.innerHTML = `<div class="scr"><h2>ИВРИТ 1010</h2><br>
-            ${state.files.map(f => `<button class="btn" onclick="load('${f.download_url}')">${f.name}</button>`).join('')}
-            <button class="btn-sec" onclick="start()">🔄 Обновить список</button></div>`;
-    } else if (state.screen === 'cats') {
-        const cats = [...new Set(DICT.map(w => w.cat))];
-        app.innerHTML = `<div class="scr"><h2>ТЕМЫ</h2><br>
-            ${cats.map(c => `<button class="btn" onclick="state.words=DICT.filter(w=>w.cat==='${c}'); state.screen='play'; render()">${c}</button>`).join('')}
-            <button class="btn-sec" onclick="state.screen='start';render()">Назад</button></div>`;
-    } else if (state.screen === 'play') {
+        app.innerHTML = `<h2>Выбери файл:</h2>` + state.files.map(f => `<button class="btn" onclick="load('${f.download_url}')">${f.name}</button>`).join('');
+    } else {
         const w = state.words[state.idx];
-        app.innerHTML = `<div class="scr">
-            <div id="status">Нажми СЛУШАТЬ</div>
-            <div class="card" onclick="state.flipped=!state.flipped;render()">
-                ${!state.flipped ? `
-                    <button class="btn" onclick="event.stopPropagation(); speak('${w.he}')">🔊 СЛУШАТЬ</button>
-                    <div class="word">${w.he}</div>
-                    <div class="tr">[${w.tr}]</div>
-                ` : `
-                    <div class="word" style="color:#4ade80">${w.ru}</div>
-                `}
+        app.innerHTML = `
+            <div id="stat">Карточка ${state.idx + 1} из ${state.words.length}</div>
+            <div class="card">
+                <button class="btn" style="background:#4ade80" onclick="speak('${w.he}')">🔊 СЛУШАТЬ</button>
+                <div class="word">${w.he}</div>
+                <div style="color:#6366f1">${w.tr}</div>
+                <hr style="margin:20px 0; border:0; border-top:1px solid #334155">
+                <div class="word" style="color:#4ade80">${w.ru}</div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px">
-                <button class="btn" onclick="state.idx=Math.max(0,state.idx-1);state.flipped=false;render()">⬅</button>
-                <button class="btn" onclick="state.idx=Math.min(state.words.length-1,state.idx+1);state.flipped=false;render()">➡</button>
+            <div style="display:flex; gap:10px">
+                <button class="btn" onclick="state.idx=Math.max(0,state.idx-1);render()">⬅</button>
+                <button class="btn" onclick="state.idx=Math.min(state.words.length-1,state.idx+1);render()">➡</button>
             </div>
-            <button class="btn-sec" style="margin-top:10px" onclick="state.screen='cats';state.idx=0;render()">Назад</button>
-        </div>`;
+            <button class="btn" style="background:transparent; border:1px solid #334155" onclick="state.screen='start';state.idx=0;render()">Назад</button>
+        `;
     }
 }
 start();
