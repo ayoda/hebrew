@@ -3,28 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v46 - Full Navigation</title>
+<title>🇮🇱 Иврит 1010 v47 - Mobile Search Fix</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 24px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sans-serif;overflow:hidden}
 #app{height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column}
-.hdr{background:rgba(30,41,59,0.9);padding:15px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)}
+.hdr{background:rgba(30,41,59,0.9);padding:15px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0}
 .hdr-title{font-size:20px;font-weight:800;color:var(--accent)}
-.scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:16px;position:relative}
+.scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 .btn { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
 .btn-sec { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%; }
 .dict-item { background: #1e293b; border: 1px solid rgba(99, 102, 241, 0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-.search-input { width: 100%; padding: 16px 20px; border-radius: 15px; border: 2px solid var(--accent); background: #1e293b; color: white; font-size: 18px; outline: none; margin-bottom:15px; }
+
+/* Фикс поиска: запрещаем сжатие */
+.search-input { width: 100%; padding: 16px 20px; border-radius: 15px; border: 2px solid var(--accent); background: #1e293b; color: white; font-size: 18px; outline: none; margin-bottom:15px; flex-shrink: 0; }
+
 .cat-card, .search-res-card { background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
 .cat-icon { font-size: 24px; margin-right: 15px; background: rgba(99, 102, 241, 0.1); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
 
-/* Флэш-карты и навигация */
-.flash-top { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 10px; }
+/* Навигация */
+.flash-top { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 10px; flex-shrink: 0; }
 .btn-yellow-up { background: var(--yellow); color: #000; border: none; width: 50px; height: 50px; border-radius: 12px; font-size: 24px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; }
+.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .flip-container { perspective: 1000px; width: 100%; height: 380px; }
 .flipper { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; cursor: pointer; }
 .flipper.flipped { transform: rotateY(180deg); }
@@ -108,7 +111,7 @@ function render() {
         const cats = [...new Set(DICT.map(w => w.cat))];
         app.innerHTML = `<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header>
             <div class="scr">
-                <div class="flash-top" style="justify-content: flex-start; gap:15px">
+                <div class="flash-top" style="justify-content: flex-start; gap:15px; margin-bottom:15px">
                     <button class="btn-yellow-up" onclick="state.screen='start';render()">▲</button>
                     <div style="font-size:18px; font-weight:bold; color:#94a3b8">К файлам</div>
                 </div>
@@ -134,7 +137,6 @@ function render() {
                 
                 <div class="flash-wrap">
                     <button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button>
-                    
                     <div class="flip-container">
                         <div class="flipper ${state.isFlipped ? 'flipped' : ''}" onclick="state.isFlipped = !state.isFlipped; render()">
                             <div class="front">
@@ -149,7 +151,6 @@ function render() {
                             </div>
                         </div>
                     </div>
-                    
                     <button class="side-nav side-next" onclick="changeIdx(1)">❯</button>
                 </div>
             </div>`;
