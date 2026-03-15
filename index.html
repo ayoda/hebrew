@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v67 - 3D Spin Fix</title>
+<title>🇮🇱 Иврит 1010 v68 - Hard 3D Fix</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 24px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -18,13 +18,8 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .file-item { 
     background: #add8e6 !important; 
     border: 3px solid #ffffff !important; 
-    padding: 16px; 
-    border-radius: 15px; 
-    margin-bottom: 12px; 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    gap: 12px;
+    padding: 16px; border-radius: 15px; margin-bottom: 12px; 
+    cursor: pointer; display: flex; align-items: center; gap: 12px;
 }
 .file-name { color: #000000 !important; font-weight: 900; font-size: 18px; }
 
@@ -37,77 +32,67 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .flash-top { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 8px; flex-shrink:0; }
 .btn-yellow-up { background: #facc15; color: #000; border: none; width: 42px; height: 42px; border-radius: 10px; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-/* КРАСИВАЯ 3D КАРТОЧКА */
-.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; }
-.flip-container { perspective: 1000px; width: 100%; height: 380px; }
+/* КАРТОЧКА С УЛУЧШЕННОЙ 3D АНИМАЦИЕЙ */
+.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: visible; }
+.flip-container { perspective: 1200px; width: 100%; height: 380px; }
 .flipper { 
     position: relative; width: 100%; height: 100%; 
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
-    transform-style: preserve-3d; cursor: pointer; 
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    transform-style: preserve-3d; transform: translateZ(0); /* Пинок для GPU */
 }
-.flipper.flipped { transform: rotateY(180deg); }
+.flipper.flipped { transform: rotateY(180deg) translateZ(0); }
 
 .front, .back { 
     position: absolute; width: 100%; height: 100%; 
     backface-visibility: hidden; -webkit-backface-visibility: hidden;
     display: flex; flex-direction: column; align-items: center; justify-content: center; 
     background: #1e293b; border-radius: 24px; 
-    border: 2px solid rgba(99, 102, 241, 0.4); padding: 15px; 
+    border: 2px solid rgba(99, 102, 241, 0.6); padding: 15px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 .back { transform: rotateY(180deg); border-color: #4ade80; }
 
-/* СТРЕЛКИ */
-.side-nav { position: absolute; top: 55%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.25); border: 1px solid #6366f1; color: white; width: 40px; height: 70px; border-radius: 8px; font-size: 22px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.side-prev { left: -5px; }
-.side-next { right: -5px; }
+.side-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.3); border: 1px solid #6366f1; color: white; width: 40px; height: 75px; border-radius: 10px; font-size: 24px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.side-prev { left: -8px; }
+.side-next { right: -8px; }
 
-.emoji-box { font-size: 45px; margin-bottom: 5px; }
-.word-main { font-size: 32px; font-weight: 800; text-align: center; line-height: 1.1; }
-.word-sub { font-size: 16px; color: #6366f1; margin-top: 10px; text-align: center; }
-.btn-voice { background: rgba(99, 102, 241, 0.15); border: 1px solid #6366f1; color: #6366f1; padding: 8px 18px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
+.emoji-box { font-size: 50px; margin-bottom: 5px; }
+.word-main { font-size: 34px; font-weight: 800; text-align: center; line-height: 1.1; }
+.word-sub { font-size: 18px; color: #6366f1; margin-top: 10px; text-align: center; }
+.btn-voice { background: #1e293b; border: 1px solid #6366f1; color: #6366f1; padding: 10px 20px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
 
-.btn { background: #6366f1; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
-.cat-card { background: #1e293b; border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
+.btn { background: #6366f1; color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
+.cat-card { background: #1e293b; border-radius: 16px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid #334155; }
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>
-var GITHUB_USER = "ayoda"; 
-var GITHUB_REPO = "hebrew"; 
-var DICT = [];
-var state = { screen: 'start', currentCat: null, words: [], idx: 0, isFlipped: false, mode: 'he', q: '', availableFiles: [] };
+var GITHUB_USER = "ayoda"; var GITHUB_REPO = "hebrew"; 
+var DICT = []; var state = { screen: 'start', currentCat: null, words: [], idx: 0, isFlipped: false, mode: 'he', q: '', availableFiles: [] };
 
 function speak(text) {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    var utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'he-IL';
-    utterance.rate = 0.9;
-    window.speechSynthesis.speak(utterance);
+    if (!window.speechSynthesis) return; window.speechSynthesis.cancel();
+    var utterance = new SpeechSynthesisUtterance(text); utterance.lang = 'he-IL';
+    utterance.rate = 0.9; window.speechSynthesis.speak(utterance);
 }
 
 function fetchFileList() {
-    fetch('https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/')
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-        state.availableFiles = data.filter(function(f) { return f.name.indexOf('.txt') !== -1; });
-        render();
-    })
-    .catch(function() { alert("GitHub Error"); });
-}
-
-function loadFile(url) {
-    fetch(url).then(function(res) { return res.text(); }).then(function(text) {
-        parseData(text);
-        state.screen = 'cats';
+    fetch('https://api.github.com/repos/'+GITHUB_USER+'/'+GITHUB_REPO+'/contents/')
+    .then(function(res){return res.json();}).then(function(data){
+        state.availableFiles = data.filter(function(f){return f.name.indexOf('.txt')!==-1;});
         render();
     });
 }
 
+function loadFile(url) {
+    fetch(url).then(function(res){return res.text();}).then(function(text){
+        parseData(text); state.screen = 'cats'; render();
+    });
+}
+
 function parseData(content) {
-    var lines = content.split('\n');
-    DICT = [];
+    var lines = content.split('\n'); DICT = [];
     for (var i = 0; i < lines.length; i++) {
         if (lines[i].indexOf(';') !== -1) {
             var p = lines[i].split(';');
@@ -117,87 +102,62 @@ function parseData(content) {
 }
 
 function runSearch(id) {
-    var el = document.getElementById(id);
-    if(!el || !el.value) return;
-    state.q = el.value.toLowerCase();
-    state.screen = 'cats';
-    render();
+    var val = document.getElementById(id).value;
+    if(!val) return; state.q = val.toLowerCase(); state.screen = 'cats'; render();
 }
 
 function render() {
-    var app = document.getElementById('app');
-    var html = '';
-
+    var app = document.getElementById('app'); var html = '';
     if (state.screen === 'start') {
-        html += '<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header>';
-        html += '<div class="scr scroll"><h2 style="text-align:center; margin-bottom:20px; color:#fff">Привет, Михалыч!</h2><div id="file-list">';
+        html += '<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header><div class="scr scroll"><h2 style="text-align:center; margin-bottom:20px; color:#fff">Привет, Михалыч!</h2><div id="file-list">';
         if (state.availableFiles.length === 0) {
             html += '<button class="btn" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>';
         } else {
             for (var i = 0; i < state.availableFiles.length; i++) {
                 var f = state.availableFiles[i];
-                html += '<div class="file-item" onclick="loadFile(\'' + f.download_url + '\')"><span style="font-size:20px">📄</span> <span class="file-name">' + f.name + '</span></div>';
+                html += '<div class="file-item" onclick="loadFile(\''+f.download_url+'\')"><span style="font-size:20px">📄</span> <span class="file-name">'+f.name+'</span></div>';
             }
         }
         html += '</div></div>';
     } else if (state.screen === 'cats') {
-        var cats = [];
-        for (var j = 0; j < DICT.length; j++) {
-            if (cats.indexOf(DICT[j].cat) === -1) cats.push(DICT[j].cat);
+        var cats = []; for (var j=0; j<DICT.length; j++) { if (cats.indexOf(DICT[j].cat)===-1) cats.push(DICT[j].cat); }
+        var catsHtml = ''; for (var k=0; k<cats.length; k++) {
+            var first = DICT.filter(function(w){return w.cat===cats[k]})[0];
+            catsHtml += '<div class="cat-card" onclick="openSetup(\''+cats[k]+'\')"><div style="font-size:22px; margin-right:12px">'+(first.icon||'📚')+'</div><div>'+cats[k]+'</div></div>';
         }
-        var catsHtml = '';
-        for (var k = 0; k < cats.length; k++) {
-            var c = cats[k];
-            var first = DICT.filter(function(w) { return w.cat === c; })[0];
-            catsHtml += '<div class="cat-card" onclick="openSetup(\'' + c + '\')"><div style="font-size:18px; margin-right:12px">' + (first.icon || '📚') + '</div><div>' + c + '</div></div>';
-        }
-        html += '<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header>';
-        html += '<div class="scr"><div class="search-wrapper"><button class="btn-yellow-up" style="margin-right:8px" onclick="state.screen=\'start\';render()">▲</button><input type="text" id="catSearch" class="inner-search" placeholder="🔍 Поиск..." value="' + state.q + '"><button class="search-btn" onclick="runSearch(\'catSearch\')">Искать</button></div><div id="list-area" class="scroll">' + (state.q ? "" : catsHtml) + '</div></div>';
+        html += '<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header><div class="scr"><div class="search-wrapper"><button class="btn-yellow-up" style="margin-right:8px" onclick="state.screen=\'start\';render()">▲</button><input type="text" id="catSearch" class="inner-search" placeholder="🔍 Поиск..." value="'+state.q+'"><button class="search-btn" onclick="runSearch(\'catSearch\')">Искать</button></div><div id="list-area" class="scroll">'+(state.q ? "" : catsHtml)+'</div></div>';
     } else if (state.screen === 'setup') {
-        html += '<header class="hdr"><div class="hdr-title">' + state.currentCat + '</div></header><div class="scr"><div style="background:#1e293b; padding:20px; border-radius:20px; text-align:center; border:1px solid #6366f1"><button class="btn" onclick="state.mode=\'he\';render()">Иврит → Перевод</button><button class="btn" style="background:transparent; border: 1px solid #334155; color: #94a3b8" onclick="state.mode=\'tr\';render()">Транскрипция → Перевод</button><button class="btn" style="margin-top:20px; background:#22c55e; color:#000" onclick="startFlash()">ПОГНАЛИ</button><button onclick="state.screen=\'cats\';render()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>';
+        html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr"><div style="background:#1e293b; padding:20px; border-radius:20px; text-align:center; border:1px solid #6366f1"><button class="btn" onclick="state.mode=\'he\';render()">Иврит → Перевод</button><button class="btn" style="background:transparent; border: 1px solid #334155; color: #94a3b8" onclick="state.mode=\'tr\';render()">Транскрипция → Перевод</button><button class="btn" style="margin-top:20px; background:#22c55e; color:#000" onclick="startFlash()">ПОГНАЛИ</button><button onclick="state.screen=\'cats\';render()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>';
     } else if (state.screen === 'flash') {
         var w = state.words[state.idx];
-        var searchUI = function(side) {
-            return '<div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="inp_' + side + '" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(\'inp_' + side + '\')">Искать</button></div>';
-        };
-        html += '<header class="hdr"><div class="hdr-title">' + state.currentCat + '</div></header><div class="scr"><div class="flash-top"><button class="btn-yellow-up" onclick="state.screen=\'cats\';render()">▲</button><div style="font-size:18px; font-weight:bold; color:#94a3b8">' + (state.idx + 1) + ' / ' + state.words.length + '</div></div><div class="flash-wrap"><button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button><div class="flip-container"><div id="flipper_card" class="flipper ' + (state.isFlipped ? 'flipped' : '') + '" onclick="state.isFlipped = !state.isFlipped; render()"><div class="front">' + searchUI('f') + '<div class="emoji-box">' + w.icon + '</div><button class="btn-voice" onclick="event.stopPropagation(); speak(\'' + w.he + '\')">🔊</button><div class="word-main">' + (state.mode === 'he' ? w.he : w.tr) + '</div><div class="word-sub">[' + w.tr + ']</div></div><div class="back">' + searchUI('b') + '<div class="emoji-box">' + w.icon + '</div><div class="word-main" style="color:#4ade80">' + w.ru + '</div></div></div></div><button class="side-nav side-next" onclick="changeIdx(1)">❯</button></div></div>';
+        var searchUI = function(side) { return '<div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="inp_'+side+'" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(\'inp_'+side+'\')">Искать</button></div>'; };
+        html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr"><div class="flash-top"><button class="btn-yellow-up" onclick="state.screen=\'cats\';render()">▲</button><div style="font-size:18px; font-weight:bold; color:#94a3b8">'+(state.idx+1)+' / '+state.words.length+'</div></div><div class="flash-wrap"><button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button><div class="flip-container"><div id="flipper_card" class="flipper '+(state.isFlipped ? 'flipped' : '')+'" onclick="state.isFlipped=!state.isFlipped; render()"><div class="front">'+searchUI('f')+'<div class="emoji-box">'+w.icon+'</div><button class="btn-voice" onclick="event.stopPropagation(); speak(\''+w.he+'\')">🔊</button><div class="word-main">'+(state.mode==='he' ? w.he : w.tr)+'</div><div class="word-sub">['+w.tr+']</div></div><div class="back">'+searchUI('b')+'<div class="emoji-box">'+w.icon+'</div><div class="word-main" style="color:#4ade80">'+w.ru+'</div></div></div></div><button class="side-nav side-next" onclick="changeIdx(1)">❯</button></div></div>';
     }
-    app.innerHTML = html;
-    if (state.screen === 'cats' && state.q) renderSearch();
+    app.innerHTML = html; if (state.screen === 'cats' && state.q) renderSearch();
 }
 
 function renderSearch() {
-    var q = state.q.trim();
-    var listArea = document.getElementById('list-area');
-    if (!listArea) return;
-    var resHtml = '';
-    for (var i = 0; i < DICT.length; i++) {
-        var item = DICT[i];
-        if (item.he.toLowerCase().indexOf(q) !== -1 || item.ru.toLowerCase().indexOf(q) !== -1 || item.tr.toLowerCase().indexOf(q) !== -1) {
-            resHtml += '<div class="cat-card" onclick="jumpToWord(\'' + item.he + '\')"><div style="font-size:18px; margin-right:12px">' + item.icon + '</div><div class="res-info"><b>' + item.he + '</b> [' + item.tr + ']<br><small>' + item.ru + '</small></div></div>';
+    var q = state.q.trim(); var listArea = document.getElementById('list-area'); if (!listArea) return;
+    var resHtml = ''; for (var i=0; i<DICT.length; i++) {
+        var item = DICT[i]; if (item.he.toLowerCase().indexOf(q)!==-1 || item.ru.toLowerCase().indexOf(q)!==-1 || item.tr.toLowerCase().indexOf(q)!==-1) {
+            resHtml += '<div class="cat-card" onclick="jumpToWord(\''+item.he+'\')"><div style="font-size:22px; margin-right:12px">'+item.icon+'</div><div><b>'+item.he+'</b> ['+item.tr+']<br><small>'+item.ru+'</small></div></div>';
         }
     }
     listArea.innerHTML = resHtml;
 }
 
 function jumpToWord(he) {
-    var w = DICT.filter(function(x) { return x.he === he; })[0];
-    state.currentCat = w.cat; 
-    state.words = DICT.filter(function(x) { return x.cat === w.cat; });
-    for (var i = 0; i < state.words.length; i++) {
-        if (state.words[i].he === he) { state.idx = i; break; }
-    }
-    state.isFlipped = false; state.screen = 'flash'; render();
+    var w = DICT.filter(function(x){return x.he===he})[0];
+    state.currentCat = w.cat; state.words = DICT.filter(function(x){return x.cat===w.cat});
+    for (var i=0; i<state.words.length; i++) { if (state.words[i].he===he) { state.idx=i; break; } }
+    state.isFlipped=false; state.screen='flash'; render();
 }
 function openSetup(c) { state.currentCat = c; state.screen = 'setup'; render(); }
 function startFlash() {
-    state.words = DICT.filter(function(w) { return w.cat === state.currentCat; }).sort(function() { return 0.5 - Math.random(); });
+    state.words = DICT.filter(function(w){return w.cat===state.currentCat}).sort(function(){return 0.5-Math.random()});
     state.idx = 0; state.isFlipped = false; state.screen = 'flash'; render();
 }
-function changeIdx(delta) {
-    var n = state.idx + delta;
-    if (n >= 0 && n < state.words.length) { state.idx = n; state.isFlipped = false; render(); }
-}
+function changeIdx(delta) { var n = state.idx + delta; if (n >= 0 && n < state.words.length) { state.idx = n; state.isFlipped = false; render(); } }
 render();
 </script>
 </body>
