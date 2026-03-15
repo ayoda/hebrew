@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v79 - TRUE 3D RETURN</title>
+<title>🇮🇱 Иврит 1010 v80 - THE FINAL POINT</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -22,26 +22,26 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 }
 .file-name { color: #000 !important; font-weight: 900; font-size: 18px; text-align: center; }
 
-/* ПОИСК ВНУТРИ */
-.search-wrapper { width: 95%; display: flex !important; margin-bottom: 10px; }
+/* ПОИСК */
+.search-wrapper { width: 100%; display: flex !important; margin-bottom: 15px; }
 .inner-search { flex: 1; padding: 10px; border-radius: 10px 0 0 10px; border: 2px solid #6366f1; background: #0f172a; color: white; font-size: 14px; outline: none; }
 .search-btn { width: 75px; background: #facc15; color: #000; border: 2px solid #6366f1; border-left: none; border-radius: 0 10px 10px 0; font-weight: 900; font-size: 11px; cursor: pointer; }
 
-/* ТА САМАЯ 3D АНИМАЦИЯ */
-.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; perspective: 1200px; }
-.flipper { 
-    position: relative; width: 100%; height: 380px; 
-    transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer;
+/* КЛАССИЧЕСКИЙ 3D ПОВОРОТ */
+.scene { width: 100%; height: 380px; perspective: 1000px; position: relative; display: flex; align-items: center; justify-content: center; }
+.card { 
+    width: 100%; height: 100%; position: relative; 
+    transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; 
 }
-.flipper.flipped { transform: rotateY(180deg); }
+.card.is-flipped { transform: rotateY(180deg); }
 
-.front, .back { 
+.card__face { 
     position: absolute; width: 100%; height: 100%; 
-    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden; 
     display: flex; flex-direction: column; align-items: center; justify-content: center; 
     background: #1e293b; border-radius: 24px; border: 2px solid #6366f1; padding: 15px; 
 }
-.back { transform: rotateY(180deg); border-color: #4ade80; }
+.card__face--back { transform: rotateY(180deg); border-color: #4ade80; }
 
 .side-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.4); border: 1px solid #6366f1; color: white; width: 42px; height: 80px; border-radius: 10px; font-size: 26px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .side-prev { left: -5px; }
@@ -50,7 +50,7 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .emoji-box { font-size: 55px; margin-bottom: 5px; }
 .word-main { font-size: 34px; font-weight: 800; text-align: center; }
 .word-sub { font-size: 18px; color: #6366f1; margin-top: 10px; }
-.btn-voice { background: transparent; border: 2px solid #6366f1; color: #6366f1; padding: 8px 20px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
+.btn-voice { background: transparent; border: 2px solid #6366f1; color: #6366f1; padding: 10px 20px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
 
 .btn { background: #6366f1; color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
 .cat-card { background: #1e293b; border-radius: 16px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid #334155; }
@@ -123,10 +123,10 @@ function render() {
         var sId = state.isFlipped ? 'sb' : 'sf';
         html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr">';
         html += '<div class="flash-top"><button style="background:#facc15; border:none; border-radius:10px; width:45px; height:45px; font-weight:bold" onclick="state.screen=\'cats\';render()">▲</button><div style="font-size:20px; font-weight:bold; color:#94a3b8">'+(state.idx+1)+' / '+state.words.length+'</div></div>';
-        html += '<div class="flash-wrap"><button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button>';
-        html += '<div class="flipper '+(state.isFlipped?'flipped':'')+'" onclick="state.isFlipped=!state.isFlipped; render()">';
-        html += '<div class="front"><div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="sf" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(document.getElementById(\'sf\').value)">Искать</button></div><div class="emoji-box">'+w.icon+'</div><button class="btn-voice" onclick="event.stopPropagation(); speak(\''+w.he+'\')">🔊 СЛУШАТЬ</button><div class="word-main">'+(state.mode==='he'?w.he:w.tr)+'</div><div class="word-sub">['+w.tr+']</div></div>';
-        html += '<div class="back"><div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="sb" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(document.getElementById(\'sb\').value)">Искать</button></div><div class="emoji-box">'+w.icon+'</div><div class="word-main" style="color:#4ade80">'+w.ru+'</div></div>';
+        html += '<div class="scene"><button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button>';
+        html += '<div class="card '+(state.isFlipped?'is-flipped':'')+'" onclick="state.isFlipped=!state.isFlipped; render()">';
+        html += '<div class="card__face card__face--front"><div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="sf" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(document.getElementById(\'sf\').value)">Искать</button></div><div class="emoji-box">'+w.icon+'</div><button class="btn-voice" onclick="event.stopPropagation(); speak(\''+w.he+'\')">🔊 СЛУШАТЬ</button><div class="word-main">'+(state.mode==='he'?w.he:w.tr)+'</div><div class="word-sub">['+w.tr+']</div></div>';
+        html += '<div class="card__face card__face--back"><div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="sb" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(document.getElementById(\'sb\').value)">Искать</button></div><div class="emoji-box">'+w.icon+'</div><div class="word-main" style="color:#4ade80">'+w.ru+'</div></div>';
         html += '</div><button class="side-nav side-next" onclick="changeIdx(1)">❯</button></div></div>';
     }
     app.innerHTML = html; if (state.screen === 'cats' && state.q) renderSearch();
