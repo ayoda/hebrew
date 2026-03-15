@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v48 - Fix Search</title>
+<title>🇮🇱 Иврит 1010 v49 - Search Fixed</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 24px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -14,14 +14,13 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
 .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* ФИКС ДЛЯ ПОИСКА: Жестко фиксируем верхнюю часть на экране ТЕМЫ */
-.static-top { flex-shrink: 0; background: var(--bg-main); z-index: 5; padding-bottom: 5px; }
+/* Блок навигации и поиска (ТЕМЫ) */
+.nav-and-search { flex-shrink: 0; width: 100%; margin-bottom: 10px; }
+.search-input { width: 100%; padding: 16px; border-radius: 15px; border: 2px solid var(--accent); background: #1e293b; color: white; font-size: 18px; outline: none; margin-top: 10px; }
 
 .btn { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
 .btn-sec { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%; }
 .dict-item { background: #1e293b; border: 1px solid rgba(99, 102, 241, 0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-
-.search-input { width: 100%; padding: 16px 20px; border-radius: 15px; border: 2px solid var(--accent); background: #1e293b; color: white; font-size: 18px; outline: none; margin-bottom:10px; display: block !important; }
 
 .cat-card, .search-res-card { background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
 .cat-icon { font-size: 24px; margin-right: 15px; background: rgba(99, 102, 241, 0.1); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
@@ -108,12 +107,12 @@ function render() {
         const cats = [...new Set(DICT.map(w => w.cat))];
         app.innerHTML = `<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header>
             <div class="scr">
-                <div class="static-top">
-                    <div class="flash-top" style="justify-content: flex-start; gap:15px; margin-bottom:10px">
+                <div class="nav-and-search">
+                    <div style="display:flex; align-items:center; gap:15px">
                         <button class="btn-yellow-up" onclick="state.screen='start';render()">▲</button>
-                        <div style="font-size:18px; font-weight:bold; color:#94a3b8">К файлам</div>
+                        <span style="font-weight:bold; color:#94a3b8">К файлам</span>
                     </div>
-                    <input type="text" class="search-input" placeholder="🔍 Поиск..." oninput="state.q = this.value.toLowerCase(); renderSearch()" value="${state.q}">
+                    <input type="text" class="search-input" placeholder="🔍 Поиск слова..." oninput="state.q = this.value.toLowerCase(); renderSearch()" value="${state.q}">
                 </div>
                 <div id="list-area" class="scroll">${state.q ? "" : renderCatsHtml(cats)}</div>
             </div>`;
