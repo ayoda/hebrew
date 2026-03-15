@@ -3,49 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v40</title>
+<title>🇮🇱 Иврит 1010 v41 - Mobile Fix</title>
 <style>
-:root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 24px; }
+:root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 20px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sans-serif;overflow:hidden}
-#app{height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column}
-.hdr{background:rgba(30,41,59,0.9);padding:15px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)}
-.hdr-title{font-size:20px;font-weight:800;color:var(--accent)}
-.scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:16px;position:relative}
-.scroll{flex:1;overflow-y:auto}
+html, body { height: 100%; background: var(--bg-main); color: var(--text-main); font-family: sans-serif; overflow: hidden; }
+#app { height: 100vh; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; }
+.hdr { background: rgba(30,41,59,0.9); padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+.hdr-title { font-size: 18px; font-weight: 800; color: var(--accent); }
+.scr { flex: 1; display: flex; flex-direction: column; padding: 12px; position: relative; overflow: hidden; }
+.scroll { flex: 1; overflow-y: auto; }
 
-/* Кнопки и поиск для общих экранов */
-.btn { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
+/* Общие кнопки */
+.btn { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
 .btn-sec { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%; }
-.search-input { width: 100%; padding: 16px 20px; border-radius: 15px; border: 2px solid var(--accent); background: #1e293b; color: white; font-size: 18px; outline: none; margin-bottom:15px; }
+.search-input { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--accent); background: #1e293b; color: white; font-size: 16px; outline: none; margin-bottom:10px; }
 
-/* ВЕРХНЯЯ ПАНЕЛЬ (Flash) */
-.flash-nav-top { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px; }
-.btn-up { background: var(--yellow); color: #000; border: none; width: 55px; height: 55px; border-radius: 12px; font-size: 28px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.counter { font-size: 22px; font-weight: bold; color: #94a3b8; }
+/* ВЕРХНЯЯ ПАНЕЛЬ ФЛЕШ-КАРТ */
+.flash-nav-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; flex-shrink: 0; }
+.btn-up { background: var(--yellow); color: #000; border: none; width: 50px; height: 50px; border-radius: 12px; font-size: 24px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.counter { font-size: 18px; font-weight: bold; color: #94a3b8; }
 
-/* ЦЕНТРАЛЬНАЯ ЗОНА С КАРТОЧКОЙ */
-.flash-container { position: relative; width: 100%; height: 400px; display: flex; align-items: center; justify-content: center; }
-.flip-container { perspective: 1000px; width: 75%; height: 100%; }
+/* КОНТЕЙНЕР КАРТОЧКИ */
+.flash-container { position: relative; flex: 1; width: 100%; min-height: 300px; display: flex; align-items: center; justify-content: center; }
+.flip-container { perspective: 1000px; width: 100%; height: 100%; max-height: 450px; }
 .flipper { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; cursor: pointer; }
 .flipper.flipped { transform: rotateY(180deg); }
-.front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border-radius: var(--radius); border: 2px solid rgba(99, 102, 241, 0.3); padding: 20px; }
+.front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border-radius: var(--radius); border: 2px solid rgba(99, 102, 241, 0.3); padding: 15px; }
 .back { transform: rotateY(180deg); border-color: #4ade80; }
 
-/* БОКОВЫЕ СТРЕЛКИ (Листание) */
-.side-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.2); border: 1px solid var(--accent); color: white; width: 50px; height: 80px; border-radius: 12px; font-size: 24px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
-.arrow-prev { left: 0; }
-.arrow-next { right: 0; }
+/* БОКОВЫЕ СТРЕЛКИ (Поверх карточки для экономии места) */
+.side-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); color: white; width: 44px; height: 60px; border-radius: 8px; font-size: 20px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
+.arrow-prev { left: 5px; }
+.arrow-next { right: 5px; }
 
-.emoji-box { font-size: 60px; margin-bottom: 10px; }
-.word-main { font-size: 34px; font-weight: 800; text-align: center; width: 100%; word-wrap: break-word; }
-.word-sub { font-size: 18px; color: var(--accent); margin-top: 15px; text-align: center; }
-.btn-voice { background: rgba(99, 102, 241, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 50px; margin-bottom: 15px; cursor: pointer; font-weight: bold; }
+.emoji-box { font-size: 50px; margin-bottom: 5px; }
+.word-main { font-size: 32px; font-weight: 800; text-align: center; width: 100%; overflow-wrap: break-word; line-height: 1.2; }
+.word-sub { font-size: 16px; color: var(--accent); margin-top: 10px; text-align: center; }
+.btn-voice { background: rgba(99, 102, 241, 0.2); border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 50px; margin-bottom: 15px; cursor: pointer; font-size: 20px; }
 
-/* Остальные элементы списка */
-.dict-item { background: #1e293b; border: 1px solid rgba(99, 102, 241, 0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-.cat-card, .search-res-card { background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; cursor: pointer; }
-.cat-icon { font-size: 24px; margin-right: 15px; background: rgba(99, 102, 241, 0.1); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+/* Категории */
+.cat-card { background: var(--bg-card); border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
+.cat-icon { font-size: 20px; margin-right: 12px; background: rgba(99, 102, 241, 0.1); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -61,7 +60,7 @@ function speak(text) {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'he-IL';
-    utterance.rate = 0.9;
+    utterance.rate = 0.85;
     window.speechSynthesis.speak(utterance);
 }
 
@@ -81,7 +80,7 @@ async function loadFile(url) {
         parseData(text);
         state.screen = 'cats';
         render();
-    } catch (err) { alert("Ошибка загрузки файла"); }
+    } catch (err) { alert("Ошибка загрузки"); }
 }
 
 function parseData(content) {
@@ -100,7 +99,7 @@ function render() {
                 <div id="file-list">
                     ${state.availableFiles.length === 0 
                         ? '<button class="btn" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>' 
-                        : state.availableFiles.map(f => `<div class="dict-item" onclick="loadFile('${f.download_url}')">📄 <b>${f.name}</b></div>`).join('')}
+                        : state.availableFiles.map(f => `<div class="cat-card" onclick="loadFile('${f.download_url}')">📄 <b>${f.name}</b></div>`).join('')}
                 </div>
             </div>`;
     } else if (state.screen === 'cats') {
@@ -109,7 +108,7 @@ function render() {
             <div class="scr">
                 <input type="text" class="search-input" placeholder="🔍 Поиск..." oninput="state.q = this.value.toLowerCase(); renderSearch()" value="${state.q}">
                 <div id="list-area" class="scroll">${state.q ? "" : renderCatsHtml(cats)}</div>
-                <button class="btn-sec" onclick="state.screen='start';render()">⬅ К выбору файла</button>
+                <button class="btn-sec" onclick="state.screen='start';render()">⬅ К файлам</button>
             </div>`;
         if (state.q) renderSearch();
     } else if (state.screen === 'setup') {
@@ -117,7 +116,7 @@ function render() {
             <div class="scr"><div style="background:var(--bg-card); padding:20px; border-radius:20px; text-align:center">
             <button class="btn ${state.mode === 'he' ? '' : 'btn-sec'}" onclick="state.mode='he';render()">Иврит → Перевод</button>
             <button class="btn ${state.mode === 'tr' ? '' : 'btn-sec'}" onclick="state.mode='tr';render()">Транскрипция → Перевод</button>
-            <button class="btn" style="margin-top:20px; background:#4ade80" onclick="startFlash()">ПОГНАЛИ</button>
+            <button class="btn" style="margin-top:20px; background:#22c55e" onclick="startFlash()">ПОГНАЛИ</button>
             <button class="btn-sec" onclick="state.screen='cats';render()">Назад</button></div></div>`;
     } else if (state.screen === 'flash') {
         const w = state.words[state.idx];
@@ -127,7 +126,7 @@ function render() {
                 <div class="flash-nav-top">
                     <button class="btn-up" onclick="state.screen='cats';render()">▲</button>
                     <div class="counter">${state.idx + 1} / ${state.words.length}</div>
-                </div>
+                    <div style="width:50px"></div> </div>
 
                 <div class="flash-container">
                     <button class="side-arrow arrow-prev" onclick="changeIdx(-1)">❮</button>
@@ -157,9 +156,9 @@ function renderSearch() {
     const q = state.q.trim();
     const listArea = document.getElementById('list-area');
     const filtered = DICT.filter(w => w.he.toLowerCase().includes(q) || w.ru.toLowerCase().includes(q) || w.tr.toLowerCase().includes(q));
-    listArea.innerHTML = filtered.map(w => `<div class="search-res-card" onclick="jumpToWord('${w.he}')">
+    listArea.innerHTML = filtered.map(w => `<div class="cat-card" onclick="jumpToWord('${w.he}')">
         <div class="cat-icon" style="font-size:20px">${w.icon}</div>
-        <div class="res-info"><b>${w.he}</b> [${w.tr}]<br><small>${w.ru}</small></div></div>`).join('');
+        <div><b>${w.he}</b><br><small>${w.ru}</small></div></div>`).join('');
 }
 
 function renderCatsHtml(cats) {
@@ -170,4 +169,19 @@ function jumpToWord(he) {
     const w = DICT.find(x => x.he === he);
     state.currentCat = w.cat; state.words = DICT.filter(x => x.cat === w.cat);
     state.idx = state.words.findIndex(x => x.he === he);
-    state.isFlipped = false; state.screen = 'flash';
+    state.isFlipped = false; state.screen = 'flash'; render();
+}
+
+function openSetup(c) { state.currentCat = c; state.screen = 'setup'; render(); }
+function startFlash() {
+    state.words = DICT.filter(w => w.cat === state.currentCat).sort(() => Math.random() - 0.5);
+    state.idx = 0; state.isFlipped = false; state.screen = 'flash'; render();
+}
+function changeIdx(delta) {
+    let n = state.idx + delta;
+    if (n >= 0 && n < state.words.length) { state.idx = n; state.isFlipped = false; render(); }
+}
+render();
+</script>
+</body>
+</html>
