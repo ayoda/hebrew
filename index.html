@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v63 - Classic Stable</title>
+<title>🇮🇱 Иврит 1010 v64 - Perfect Edition</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 24px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -14,10 +14,10 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
 .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* ВОТ ОНИ - НЕЖНО ГОЛУБЫЕ КНОПКИ С БЕЛОЙ РАМКОЙ */
+/* Кнопки файлов: нежно-голубой фон + жирная белая рамка */
 .file-item { 
-    background: #add8e6 !important; /* Нежно-голубой */
-    border: 3px solid #ffffff !important; /* Белая линия */
+    background: #add8e6 !important; 
+    border: 3px solid #ffffff !important; 
     padding: 16px; 
     border-radius: 15px; 
     margin-bottom: 12px; 
@@ -25,17 +25,19 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
     display: flex; 
     align-items: center; 
     gap: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 .file-name { color: #000000 !important; font-weight: 900; font-size: 18px; }
 
+/* Поиск */
 .search-wrapper { width: 100%; display: flex !important; align-items: stretch; margin-bottom: 12px; flex-shrink: 0; }
 .inner-search { flex: 1; min-width: 50px; padding: 10px; border-radius: 12px 0 0 12px; border: 2px solid var(--accent); background: #0f172a; color: white; font-size: 15px; outline: none; }
 .search-btn { width: 85px !important; flex-shrink: 0 !important; background: var(--yellow); color: #000; border: 2px solid var(--accent); border-left: none; border-radius: 0 12px 12px 0; font-weight: 900; font-size: 13px; cursor: pointer; }
 
+/* Навигация */
 .flash-top { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 8px; flex-shrink:0; }
 .btn-yellow-up { background: var(--yellow); color: #000; border: none; width: 42px; height: 42px; border-radius: 10px; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
+/* 3D Карточка */
 .flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .flip-container { perspective: 1000px; width: 100%; height: 85%; max-height: 380px; }
 .flipper { position: relative; width: 100%; height: 100%; transition: 0.6s; transform-style: preserve-3d; cursor: pointer; }
@@ -76,8 +78,8 @@ function speak(text) {
 async function fetchFileList() {
     try {
         const response = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
-        const files = await response.json();
-        state.availableFiles = files.filter(f => f.name.endsWith('.txt'));
+        const data = await response.json();
+        state.availableFiles = data.filter(f => f.name.indexOf('.txt') !== -1);
         render();
     } catch (err) { alert("GitHub Error"); }
 }
@@ -93,9 +95,13 @@ async function loadFile(url) {
 }
 
 function parseData(content) {
-    DICT = content.split('\n').filter(l => l.includes(';')).map(line => {
-        const p = line.split(';');
-        return { cat: p[0].trim(), he: p[1].trim(), tr: p[2].trim(), ru: p[3].trim(), icon: (p[4] || "📖").trim() };
+    const lines = content.split('\n');
+    DICT = [];
+    lines.forEach(line => {
+        if (line.indexOf(';') !== -1) {
+            const p = line.split(';');
+            DICT.push({ cat: p[0].trim(), he: p[1].trim(), tr: p[2].trim(), ru: p[3].trim(), icon: (p[4] || "📖").trim() });
+        }
     });
 }
 
@@ -110,17 +116,27 @@ function runSearch(id) {
 function render() {
     const app = document.getElementById('app');
     if (state.screen === 'start') {
+        let filesHtml = '';
+        if (state.availableFiles.length === 0) {
+            filesHtml = '<button class="btn" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>';
+        } else {
+            state.availableFiles.forEach(f => {
+                filesHtml += `<div class="file-item" onclick="loadFile('${f.download_url}')"><span style="font-size:20px">📄</span> <span class="file-name">${f.name}</span></div>`;
+            });
+        }
         app.innerHTML = `<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header>
             <div class="scr scroll">
                 <h2 style="text-align:center; margin-bottom:20px">Привет, Михалыч!</h2>
-                <div id="file-list">
-                    ${state.availableFiles.length === 0 
-                        ? '<button class="btn" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>' 
-                        : state.availableFiles.map(f => `<div class="file-item" onclick="loadFile('${f.download_url}')"><span style="font-size:20px">📄</span> <span class="file-name">${f.name}</span></div>`).join('')}
-                </div>
+                <div id="file-list">${filesHtml}</div>
             </div>`;
     } else if (state.screen === 'cats') {
-        const cats = [...new Set(DICT.map(w => w.cat))];
+        const cats = [];
+        DICT.forEach(w => { if (cats.indexOf(w.cat) === -1) cats.push(w.cat); });
+        let catsHtml = '';
+        cats.forEach(c => {
+            const first = DICT.filter(w => w.cat === c)[0];
+            catsHtml += `<div class="cat-card" onclick="openSetup('${c}')"><div style="font-size:18px; margin-right:12px">${first.icon || '📚'}</div><div>${c}</div></div>`;
+        });
         app.innerHTML = `<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header>
             <div class="scr">
                 <div class="search-wrapper">
@@ -128,15 +144,15 @@ function render() {
                     <input type="text" id="catSearch" class="inner-search" placeholder="🔍 Поиск..." value="${state.q}">
                     <button class="search-btn" onclick="runSearch('catSearch')">Искать</button>
                 </div>
-                <div id="list-area" class="scroll">${state.q ? "" : renderCatsHtml(cats)}</div>
+                <div id="list-area" class="scroll">${state.q ? "" : catsHtml}</div>
             </div>`;
         if (state.q) renderSearch();
     } else if (state.screen === 'setup') {
         app.innerHTML = `<header class="hdr"><div class="hdr-title">${state.currentCat}</div></header>
-            <div class="scr"><div style="background:var(--bg-card); padding:20px; border-radius:20px; text-align:center">
-            <button class="btn ${state.mode === 'he' ? '' : 'btn-sec'}" onclick="state.mode='he';render()">Иврит → Перевод</button>
-            <button class="btn ${state.mode === 'tr' ? '' : 'btn-sec'}" onclick="state.mode='tr';render()">Транскрипция → Перевод</button>
-            <button class="btn" style="margin-top:20px" onclick="startFlash()">ПОГНАЛИ</button>
+            <div class="scr"><div style="background:var(--bg-card); padding:20px; border-radius:20px; text-align:center; border:1px solid var(--accent)">
+            <button class="btn" onclick="state.mode='he';render()">Иврит → Перевод</button>
+            <button class="btn" style="background:transparent; border: 1px solid #334155; color: #94a3b8" onclick="state.mode='tr';render()">Транскрипция → Перевод</button>
+            <button class="btn" style="margin-top:20px; background:#22c55e; color:#000" onclick="startFlash()">ПОГНАЛИ</button>
             <button onclick="state.screen='cats';render()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>`;
     } else if (state.screen === 'flash') {
         const w = state.words[state.idx];
@@ -179,16 +195,18 @@ function renderSearch() {
     const q = state.q.trim();
     const listArea = document.getElementById('list-area');
     if (!listArea) return;
-    const filtered = DICT.filter(w => w.he.toLowerCase().indexOf(q) !== -1 || w.ru.toLowerCase().indexOf(q) !== -1 || w.tr.toLowerCase().indexOf(q) !== -1);
-    listArea.innerHTML = filtered.map(w => `<div class="cat-card" onclick="jumpToWord('${w.he}')">
-        <div style="font-size:18px; margin-right:12px">${w.icon}</div>
-        <div class="res-info"><b>${w.he}</b> [${w.tr}]<br><small>${w.ru}</small></div></div>`).join('');
-}
-function renderCatsHtml(cats) {
-    return cats.map(c => `<div class="cat-card" onclick="openSetup('${c}')"><div style="font-size:18px; margin-right:12px">${DICT.find(w => w.cat === c).icon || '📚'}</div><div>${c}</div></div>`).join('');
+    let resHtml = '';
+    DICT.forEach(item => {
+        if (item.he.toLowerCase().indexOf(q) !== -1 || item.ru.toLowerCase().indexOf(q) !== -1 || item.tr.toLowerCase().indexOf(q) !== -1) {
+            resHtml += `<div class="cat-card" onclick="jumpToWord('${item.he}')">
+                <div style="font-size:18px; margin-right:12px">${item.icon}</div>
+                <div class="res-info"><b>${item.he}</b> [${item.tr}]<br><small>${item.ru}</small></div></div>`;
+        }
+    });
+    listArea.innerHTML = resHtml;
 }
 function jumpToWord(he) {
-    const w = DICT.find(x => x.he === he);
+    const w = DICT.filter(x => x.he === he)[0];
     state.currentCat = w.cat; state.words = DICT.filter(x => x.cat === w.cat);
     state.idx = state.words.findIndex(x => x.he === he);
     state.isFlipped = false; state.screen = 'flash'; render();
