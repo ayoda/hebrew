@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v74 - Last Hope</title>
+<title>🇮🇱 Иврит 1010 v75 - Revenge</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -14,7 +14,7 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* ФАЙЛЫ: Тот самый голубой и белая рамка */
+/* Кнопки файлов: Голубой + Белая рамка */
 .file-item { 
     background-color: #add8e6 !important; 
     border: 3px solid #ffffff !important; 
@@ -22,19 +22,17 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 }
 .file-name { color: #000 !important; font-weight: 900; font-size: 18px; text-align: center; }
 
-/* ПОИСК В КАРТОЧКЕ */
-.search-wrapper { width: 95%; display: flex !important; margin-bottom: 15px; flex-shrink: 0; }
+/* Поиск внутри карточки */
+.search-wrapper { width: 90%; display: flex !important; margin-bottom: 10px; flex-shrink: 0; }
 .inner-search { flex: 1; padding: 10px; border-radius: 10px 0 0 10px; border: 2px solid #6366f1; background: #0f172a; color: white; font-size: 14px; outline: none; }
-.search-btn { width: 80px; background: #facc15; color: #000; border: 2px solid #6366f1; border-left: none; border-radius: 0 10px 10px 0; font-weight: 900; font-size: 12px; cursor: pointer; }
+.search-btn { width: 70px; background: #facc15; color: #000; border: 2px solid #6366f1; border-left: none; border-radius: 0 10px 10px 0; font-weight: 900; font-size: 11px; cursor: pointer; }
 
-/* АНИМАЦИЯ: 2D ПОВОРОТ (обман зрения) */
-.card-container { width: 100%; height: 380px; perspective: 1000px; display: flex; align-items: center; justify-content: center; }
+/* Анимация через JS */
 .card-body { 
-    width: 100%; height: 100%; background: #1e293b; border-radius: 24px; 
-    border: 2px solid #6366f1; padding: 15px; position: relative;
-    transition: transform 0.3s ease-in; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 100%; height: 380px; background: #1e293b; border-radius: 24px; 
+    border: 2px solid #6366f1; padding: 15px; display: flex; flex-direction: column; 
+    align-items: center; justify-content: center; transition: transform 0.2s ease-out;
 }
-.card-body.flipping { transform: scaleX(0); } /* Сжимаем в ноль */
 
 .side-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.4); border: 1px solid #6366f1; color: white; width: 42px; height: 80px; border-radius: 10px; font-size: 26px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .side-prev { left: -5px; }
@@ -89,21 +87,24 @@ function runSearch(val) {
     if(!val) return; state.q = val.toLowerCase(); state.screen = 'cats'; render();
 }
 
-function flipCard() {
+function handleFlip() {
     var card = document.getElementById('main-card');
-    card.classList.add('flipping');
+    card.style.transform = 'scaleX(0)'; // Схлопываем
     setTimeout(function() {
         state.isFlipped = !state.isFlipped;
         render();
-        var cardNew = document.getElementById('main-card');
-        cardNew.classList.remove('flipping');
-    }, 300);
+        var newCard = document.getElementById('main-card');
+        newCard.style.transform = 'scaleX(0)';
+        setTimeout(function() {
+            newCard.style.transform = 'scaleX(1)'; // Разворачиваем
+        }, 50);
+    }, 200);
 }
 
 function render() {
     var app = document.getElementById('app'); var html = '';
     if (state.screen === 'start') {
-        html += '<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header><div class="scr scroll"><h2 style="text-align:center; margin-bottom:20px; color:#fff">Шалом, Михалыч!</h2>';
+        html += '<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header><div class="scr scroll"><h2 style="text-align:center; margin-bottom:20px; color:#fff">Привет, Михалыч!</h2>';
         if (state.availableFiles.length === 0) {
             html += '<button class="btn" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>';
         } else {
@@ -124,14 +125,15 @@ function render() {
         html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr"><div style="background:#1e293b; padding:20px; border-radius:20px; text-align:center; border:1px solid #6366f1"><button class="btn" onclick="state.mode=\'he\';render()">Иврит → Перевод</button><button class="btn" style="background:transparent; border: 1px solid #334155; color: #94a3b8" onclick="state.mode=\'tr\';render()">Транскрипция → Перевод</button><button class="btn" style="margin-top:20px; background:#22c55e; color:#000" onclick="startFlash()">ПОГНАЛИ</button><button onclick="state.screen=\'cats\';render()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>';
     } else if (state.screen === 'flash') {
         var w = state.words[state.idx];
-        var searchUI = function(id) { return '<div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="'+id+'" class="inner-search" placeholder="🔍 Искать слово..."><button class="search-btn" onclick="runSearch(document.getElementById(\''+id+'\').value)">Искать</button></div>'; };
+        var sId = state.isFlipped ? 'sb' : 'sf';
         html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr">';
         html += '<div class="flash-top"><button style="background:#facc15; border:none; border-radius:10px; width:45px; height:45px; font-weight:bold" onclick="state.screen=\'cats\';render()">▲</button><div style="font-size:20px; font-weight:bold; color:#94a3b8">'+(state.idx+1)+' / '+state.words.length+'</div></div>';
-        html += '<div class="card-container"><button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button>';
-        html += '<div id="main-card" class="card-body" onclick="flipCard()" style="border-color:'+(state.isFlipped ? '#4ade80':'#6366f1')+'">';
-        html += searchUI(state.isFlipped ? 'inb' : 'inf');
+        html += '<div style="position:relative; width:100%; flex:1; display:flex; align-items:center; justify-content:center;">';
+        html += '<button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button>';
+        html += '<div id="main-card" class="card-body" onclick="handleFlip()" style="border-color:'+(state.isFlipped?'#4ade80':'#6366f1')+'">';
+        html += '<div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="'+sId+'" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(document.getElementById(\''+sId+'\').value)">Искать</button></div>';
         html += '<div class="emoji-box">'+w.icon+'</div>';
-        if (!state.isFlipped) {
+        if(!state.isFlipped) {
             html += '<button class="btn-voice" onclick="event.stopPropagation(); speak(\''+w.he+'\')">🔊 СЛУШАТЬ</button><div class="word-main">'+(state.mode==='he'?w.he:w.tr)+'</div><div class="word-sub">['+w.tr+']</div>';
         } else {
             html += '<div class="word-main" style="color:#4ade80">'+w.ru+'</div>';
