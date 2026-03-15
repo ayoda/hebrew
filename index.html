@@ -3,48 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v41 - Mobile Fix</title>
+<title>🇮🇱 Иврит 1010 v42 - Stable</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 20px; }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html, body { height: 100%; background: var(--bg-main); color: var(--text-main); font-family: sans-serif; overflow: hidden; }
-#app { height: 100vh; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; }
-.hdr { background: rgba(30,41,59,0.9); padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
-.hdr-title { font-size: 18px; font-weight: 800; color: var(--accent); }
-.scr { flex: 1; display: flex; flex-direction: column; padding: 12px; position: relative; overflow: hidden; }
-.scroll { flex: 1; overflow-y: auto; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg-main); color: var(--text-main); font-family: sans-serif; min-height: 100vh; }
+#app { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
 
-/* Общие кнопки */
-.btn { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
-.btn-sec { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%; }
-.search-input { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--accent); background: #1e293b; color: white; font-size: 16px; outline: none; margin-bottom:10px; }
+.hdr { background: rgba(30,41,59,0.9); padding: 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.hdr-title { font-size: 20px; font-weight: 800; color: var(--accent); }
 
-/* ВЕРХНЯЯ ПАНЕЛЬ ФЛЕШ-КАРТ */
-.flash-nav-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; flex-shrink: 0; }
-.btn-up { background: var(--yellow); color: #000; border: none; width: 50px; height: 50px; border-radius: 12px; font-size: 24px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.counter { font-size: 18px; font-weight: bold; color: #94a3b8; }
+.scr { flex: 1; padding: 15px; display: flex; flex-direction: column; }
+.scroll { overflow-y: auto; }
 
-/* КОНТЕЙНЕР КАРТОЧКИ */
-.flash-container { position: relative; flex: 1; width: 100%; min-height: 300px; display: flex; align-items: center; justify-content: center; }
-.flip-container { perspective: 1000px; width: 100%; height: 100%; max-height: 450px; }
+/* Навигация сверху */
+.flash-nav-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; width: 100%; }
+.btn-up { background: var(--yellow); color: #000; border: none; width: 50px; height: 50px; border-radius: 12px; font-size: 24px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.counter { font-size: 20px; font-weight: bold; color: #94a3b8; }
+
+/* Контейнер карточки */
+.flash-container { position: relative; width: 100%; height: 380px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+.flip-container { perspective: 1000px; width: 100%; height: 100%; }
 .flipper { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; cursor: pointer; }
 .flipper.flipped { transform: rotateY(180deg); }
-.front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border-radius: var(--radius); border: 2px solid rgba(99, 102, 241, 0.3); padding: 15px; }
+.front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border-radius: var(--radius); border: 2px solid rgba(99, 102, 241, 0.3); padding: 20px; text-align: center; }
 .back { transform: rotateY(180deg); border-color: #4ade80; }
 
-/* БОКОВЫЕ СТРЕЛКИ (Поверх карточки для экономии места) */
-.side-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); color: white; width: 44px; height: 60px; border-radius: 8px; font-size: 20px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
-.arrow-prev { left: 5px; }
-.arrow-next { right: 5px; }
+/* Стрелки */
+.side-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(15, 23, 42, 0.8); border: 1px solid var(--accent); color: white; width: 45px; height: 70px; border-radius: 10px; font-size: 22px; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; }
+.arrow-prev { left: -5px; }
+.arrow-next { right: -5px; }
 
-.emoji-box { font-size: 50px; margin-bottom: 5px; }
-.word-main { font-size: 32px; font-weight: 800; text-align: center; width: 100%; overflow-wrap: break-word; line-height: 1.2; }
-.word-sub { font-size: 16px; color: var(--accent); margin-top: 10px; text-align: center; }
-.btn-voice { background: rgba(99, 102, 241, 0.2); border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 50px; margin-bottom: 15px; cursor: pointer; font-size: 20px; }
+.emoji-box { font-size: 55px; margin-bottom: 10px; }
+.word-main { font-size: 34px; font-weight: 800; line-height: 1.1; }
+.word-sub { font-size: 18px; color: var(--accent); margin-top: 15px; }
+.btn-voice { background: rgba(99, 102, 241, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 10px 25px; border-radius: 50px; margin-bottom: 15px; cursor: pointer; font-weight: bold; }
 
-/* Категории */
-.cat-card { background: var(--bg-card); border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
-.cat-icon { font-size: 20px; margin-right: 12px; background: rgba(99, 102, 241, 0.1); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+/* Вспомогательные элементы */
+.btn { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
+.btn-sec { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%; }
+.cat-card { background: var(--bg-card); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
+.cat-icon { font-size: 24px; margin-right: 15px; background: rgba(99, 102, 241, 0.1); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+.search-input { width: 100%; padding: 16px; border-radius: 12px; border: 2px solid var(--accent); background: #1e293b; color: white; font-size: 18px; outline: none; margin-bottom:15px; }
 </style>
 </head>
 <body>
@@ -60,7 +60,7 @@ function speak(text) {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'he-IL';
-    utterance.rate = 0.85;
+    utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
 }
 
@@ -70,7 +70,7 @@ async function fetchFileList() {
         const files = await response.json();
         state.availableFiles = files.filter(f => f.name.endsWith('.txt'));
         render();
-    } catch (err) { alert("Ошибка API"); }
+    } catch (err) { alert("Ошибка GitHub API"); }
 }
 
 async function loadFile(url) {
@@ -80,7 +80,7 @@ async function loadFile(url) {
         parseData(text);
         state.screen = 'cats';
         render();
-    } catch (err) { alert("Ошибка загрузки"); }
+    } catch (err) { alert("Ошибка загрузки файла"); }
 }
 
 function parseData(content) {
@@ -108,7 +108,7 @@ function render() {
             <div class="scr">
                 <input type="text" class="search-input" placeholder="🔍 Поиск..." oninput="state.q = this.value.toLowerCase(); renderSearch()" value="${state.q}">
                 <div id="list-area" class="scroll">${state.q ? "" : renderCatsHtml(cats)}</div>
-                <button class="btn-sec" onclick="state.screen='start';render()">⬅ К файлам</button>
+                <button class="btn-sec" onclick="state.screen='start';render()">⬅ Назад к файлам</button>
             </div>`;
         if (state.q) renderSearch();
     } else if (state.screen === 'setup') {
@@ -116,7 +116,7 @@ function render() {
             <div class="scr"><div style="background:var(--bg-card); padding:20px; border-radius:20px; text-align:center">
             <button class="btn ${state.mode === 'he' ? '' : 'btn-sec'}" onclick="state.mode='he';render()">Иврит → Перевод</button>
             <button class="btn ${state.mode === 'tr' ? '' : 'btn-sec'}" onclick="state.mode='tr';render()">Транскрипция → Перевод</button>
-            <button class="btn" style="margin-top:20px; background:#22c55e" onclick="startFlash()">ПОГНАЛИ</button>
+            <button class="btn" style="margin-top:20px; background:#4ade80; color:#000" onclick="startFlash()">ПОГНАЛИ</button>
             <button class="btn-sec" onclick="state.screen='cats';render()">Назад</button></div></div>`;
     } else if (state.screen === 'flash') {
         const w = state.words[state.idx];
@@ -126,11 +126,11 @@ function render() {
                 <div class="flash-nav-top">
                     <button class="btn-up" onclick="state.screen='cats';render()">▲</button>
                     <div class="counter">${state.idx + 1} / ${state.words.length}</div>
-                    <div style="width:50px"></div> </div>
+                    <div style="width:50px"></div>
+                </div>
 
                 <div class="flash-container">
                     <button class="side-arrow arrow-prev" onclick="changeIdx(-1)">❮</button>
-                    
                     <div class="flip-container">
                         <div class="flipper ${state.isFlipped ? 'flipped' : ''}" onclick="state.isFlipped = !state.isFlipped; render()">
                             <div class="front">
@@ -145,7 +145,6 @@ function render() {
                             </div>
                         </div>
                     </div>
-
                     <button class="side-arrow arrow-next" onclick="changeIdx(1)">❯</button>
                 </div>
             </div>`;
