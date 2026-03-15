@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v75 - Revenge</title>
+<title>🇮🇱 Иврит 1010 v76 - Hammer Blow</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -14,7 +14,7 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* Кнопки файлов: Голубой + Белая рамка */
+/* ФАЙЛЫ: Голубой + Белая рамка */
 .file-item { 
     background-color: #add8e6 !important; 
     border: 3px solid #ffffff !important; 
@@ -22,16 +22,23 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 }
 .file-name { color: #000 !important; font-weight: 900; font-size: 18px; text-align: center; }
 
-/* Поиск внутри карточки */
+/* Поиск внутри */
 .search-wrapper { width: 90%; display: flex !important; margin-bottom: 10px; flex-shrink: 0; }
 .inner-search { flex: 1; padding: 10px; border-radius: 10px 0 0 10px; border: 2px solid #6366f1; background: #0f172a; color: white; font-size: 14px; outline: none; }
 .search-btn { width: 70px; background: #facc15; color: #000; border: 2px solid #6366f1; border-left: none; border-radius: 0 10px 10px 0; font-weight: 900; font-size: 11px; cursor: pointer; }
 
-/* Анимация через JS */
+/* АНИМАЦИЯ: Принудительный Keyframe */
+@keyframes cardFlip {
+    0% { transform: scaleX(1); }
+    50% { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
+}
+.animate-flip { animation: cardFlip 0.4s ease-in-out; }
+
 .card-body { 
     width: 100%; height: 380px; background: #1e293b; border-radius: 24px; 
     border: 2px solid #6366f1; padding: 15px; display: flex; flex-direction: column; 
-    align-items: center; justify-content: center; transition: transform 0.2s ease-out;
+    align-items: center; justify-content: center; position: relative;
 }
 
 .side-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.4); border: 1px solid #6366f1; color: white; width: 42px; height: 80px; border-radius: 10px; font-size: 26px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -41,7 +48,7 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .emoji-box { font-size: 60px; margin-bottom: 10px; }
 .word-main { font-size: 36px; font-weight: 800; text-align: center; }
 .word-sub { font-size: 18px; color: #6366f1; margin-top: 15px; }
-.btn-voice { background: transparent; border: 2px solid #6366f1; color: #6366f1; padding: 10px 25px; border-radius: 50px; margin-bottom: 15px; cursor: pointer; font-weight: bold; }
+.btn-voice { background: transparent; border: 2px solid #6366f1; color: #6366f1; padding: 10px 20px; border-radius: 50px; margin-bottom: 15px; cursor: pointer; font-weight: bold; }
 
 .btn { background: #6366f1; color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
 .cat-card { background: #1e293b; border-radius: 16px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid #334155; }
@@ -89,16 +96,19 @@ function runSearch(val) {
 
 function handleFlip() {
     var card = document.getElementById('main-card');
-    card.style.transform = 'scaleX(0)'; // Схлопываем
+    card.classList.add('animate-flip');
+    
+    // В середине анимации меняем контент
     setTimeout(function() {
         state.isFlipped = !state.isFlipped;
         render();
-        var newCard = document.getElementById('main-card');
-        newCard.style.transform = 'scaleX(0)';
-        setTimeout(function() {
-            newCard.style.transform = 'scaleX(1)'; // Разворачиваем
-        }, 50);
     }, 200);
+
+    // Удаляем класс после завершения
+    setTimeout(function() {
+        var el = document.getElementById('main-card');
+        if(el) el.classList.remove('animate-flip');
+    }, 400);
 }
 
 function render() {
