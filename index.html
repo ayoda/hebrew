@@ -3,44 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v51 - Search Inside</title>
+<title>🇮🇱 Иврит 1010 v52 - 3D Card Search</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 24px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sans-serif;overflow:hidden}
 #app{height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column}
-.hdr{background:rgba(30,41,59,0.9);padding:10px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0}
+.hdr{background:rgba(30,41,59,0.9);padding:12px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0}
 .hdr-title{font-size:18px;font-weight:800;color:var(--accent)}
-.scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:10px;position:relative}
+.scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* Поиск внутри карточки */
-.inner-search { width: 90%; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(99, 102, 241, 0.4); background: rgba(15, 23, 42, 0.5); color: white; font-size: 14px; outline: none; margin-bottom: 10px; text-align: center; }
+/* Внутренний поиск в карточке */
+.inner-search { 
+    width: 85%; padding: 10px; border-radius: 12px; 
+    border: 1px solid rgba(99, 102, 241, 0.5); 
+    background: rgba(15, 23, 42, 0.6); color: white; 
+    font-size: 15px; text-align: center; margin-bottom: 15px; outline: none;
+}
 
-.btn { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
-.btn-sec { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 10px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%; }
+/* Навигация */
+.flash-top { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 10px; flex-shrink:0; }
+.btn-yellow-up { background: var(--yellow); color: #000; border: none; width: 45px; height: 45px; border-radius: 12px; font-size: 20px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-.cat-card, .search-res-card { background: var(--bg-card); border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
-.cat-icon { font-size: 20px; margin-right: 12px; background: rgba(99, 102, 241, 0.1); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
-
-.flash-top { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 8px; flex-shrink: 0; }
-.btn-yellow-up { background: var(--yellow); color: #000; border: none; width: 44px; height: 44px; border-radius: 10px; font-size: 20px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
-.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: flex-start; justify-content: center; padding-top: 5px; }
-.flip-container { perspective: 1000px; width: 100%; height: 85%; max-height: 400px; }
-.flipper { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; cursor: pointer; }
+/* 3D АНИМАЦИЯ КАРТОЧКИ */
+.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; }
+.flip-container { perspective: 1000px; width: 100%; height: 400px; }
+.flipper { position: relative; width: 100%; height: 100%; transition: 0.6s; transform-style: preserve-3d; cursor: pointer; }
 .flipper.flipped { transform: rotateY(180deg); }
-.front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border-radius: var(--radius); border: 2px solid rgba(99, 102, 241, 0.3); padding: 15px; }
+
+.front, .back { 
+    position: absolute; width: 100%; height: 100%; 
+    backface-visibility: hidden; 
+    display: flex; flex-direction: column; align-items: center; justify-content: center; 
+    background: var(--bg-card); border-radius: var(--radius); 
+    border: 2px solid rgba(99, 102, 241, 0.4); padding: 20px; 
+}
 .back { transform: rotateY(180deg); border-color: #4ade80; }
 
-.side-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.3); border: 1px solid var(--accent); color: white; width: 40px; height: 60px; border-radius: 8px; font-size: 20px; z-index: 10; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.side-prev { left: -2px; }
-.side-next { right: -2px; }
+/* Боковые кнопки */
+.side-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.25); border: 1px solid var(--accent); color: white; width: 42px; height: 80px; border-radius: 10px; font-size: 24px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.side-prev { left: -5px; }
+.side-next { right: -5px; }
 
-.emoji-box { font-size: 45px; margin-bottom: 5px; }
-.word-main { font-size: 32px; font-weight: 800; text-align: center; line-height: 1.1; }
-.word-sub { font-size: 16px; color: var(--accent); margin-top: 8px; text-align: center; }
-.btn-voice { background: rgba(99, 102, 241, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; font-weight: bold; font-size: 14px; }
+.emoji-box { font-size: 55px; margin-bottom: 10px; }
+.word-main { font-size: 36px; font-weight: 800; text-align: center; line-height: 1.2; }
+.word-sub { font-size: 18px; color: var(--accent); margin-top: 15px; text-align: center; }
+.btn-voice { background: rgba(99, 102, 241, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 50px; margin-bottom: 15px; cursor: pointer; font-weight: bold; }
+
+/* Темы и категории */
+.btn { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
+.cat-card, .search-res-card { background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
+.cat-icon { font-size: 24px; margin-right: 15px; background: rgba(99, 102, 241, 0.1); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
 </style>
 </head>
 <body>
@@ -66,7 +80,7 @@ async function fetchFileList() {
         const files = await response.json();
         state.availableFiles = files.filter(f => f.name.endsWith('.txt'));
         render();
-    } catch (err) { alert("GitHub API Error"); }
+    } catch (err) { alert("GitHub Error"); }
 }
 
 async function loadFile(url) {
@@ -76,7 +90,7 @@ async function loadFile(url) {
         parseData(text);
         state.screen = 'cats';
         render();
-    } catch (err) { alert("File Load Error"); }
+    } catch (err) { alert("Load Error"); }
 }
 
 function parseData(content) {
@@ -102,7 +116,7 @@ function render() {
         const cats = [...new Set(DICT.map(w => w.cat))];
         app.innerHTML = `<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header>
             <div class="scr">
-                <div style="display:flex; align-items:center; gap:15px; margin-bottom:10px">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px">
                     <button class="btn-yellow-up" onclick="state.screen='start';render()">▲</button>
                     <input type="text" class="inner-search" style="flex:1; margin-bottom:0" placeholder="🔍 Поиск..." oninput="state.q = this.value.toLowerCase(); renderSearch()" value="${state.q}">
                 </div>
@@ -115,31 +129,31 @@ function render() {
             <button class="btn ${state.mode === 'he' ? '' : 'btn-sec'}" onclick="state.mode='he';render()">Иврит → Перевод</button>
             <button class="btn ${state.mode === 'tr' ? '' : 'btn-sec'}" onclick="state.mode='tr';render()">Транскрипция → Перевод</button>
             <button class="btn" style="margin-top:20px" onclick="startFlash()">ПОГНАЛИ</button>
-            <button class="btn-sec" onclick="state.screen='cats';render()">Назад</button></div></div>`;
+            <button class="btn-sec" onclick="state.screen='cats';render()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>`;
     } else if (state.screen === 'flash') {
         const w = state.words[state.idx];
-        const searchHtml = `<input type="text" class="inner-search" placeholder="🔍 Найти слово..." onclick="event.stopPropagation()" oninput="state.q = this.value.toLowerCase(); state.screen='cats'; renderSearch()" value="">`;
-        
+        // Инпут, который не мешает клику по карточке
+        const searchInput = `<input type="text" class="inner-search" placeholder="🔍 Найти..." onclick="event.stopPropagation()" oninput="state.q = this.value.toLowerCase(); state.screen='cats'; renderSearch()" value="">`;
+
         app.innerHTML = `<header class="hdr"><div class="hdr-title">${state.currentCat}</div></header>
             <div class="scr">
                 <div class="flash-top">
                     <button class="btn-yellow-up" onclick="state.screen='cats';render()">▲</button>
                     <div style="font-size:18px; font-weight:bold; color:#94a3b8">${state.idx + 1} / ${state.words.length}</div>
                 </div>
-                
                 <div class="flash-wrap">
                     <button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button>
                     <div class="flip-container">
                         <div class="flipper ${state.isFlipped ? 'flipped' : ''}" onclick="state.isFlipped = !state.isFlipped; render()">
                             <div class="front">
-                                ${searchHtml}
+                                ${searchInput}
                                 <div class="emoji-box">${w.icon}</div>
-                                <button class="btn-voice" onclick="event.stopPropagation(); speak('${w.he}')">🔊 СЛУШАТЬ</button>
+                                <button class="btn-voice" onclick="event.stopPropagation(); speak('${w.he}')">🔊</button>
                                 <div class="word-main">${state.mode === 'he' ? w.he : w.tr}</div>
                                 <div class="word-sub">[${w.tr}]</div>
                             </div>
                             <div class="back">
-                                ${searchHtml}
+                                ${searchInput}
                                 <div class="emoji-box">${w.icon}</div>
                                 <div class="word-main" style="color:#4ade80">${w.ru}</div>
                             </div>
@@ -156,7 +170,7 @@ function renderSearch() {
     if (!listArea) return;
     const filtered = DICT.filter(w => w.he.toLowerCase().includes(q) || w.ru.toLowerCase().includes(q) || w.tr.toLowerCase().includes(q));
     listArea.innerHTML = filtered.map(w => `<div class="search-res-card" onclick="jumpToWord('${w.he}')">
-        <div class="cat-icon" style="font-size:18px">${w.icon}</div>
+        <div class="cat-icon" style="font-size:20px">${w.icon}</div>
         <div class="res-info"><b>${w.he}</b> [${w.tr}]<br><small>${w.ru}</small></div></div>`).join('');
 }
 function renderCatsHtml(cats) {
