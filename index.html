@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v75 - Revenge</title>
+<title>🇮🇱 Иврит 1010 v95 - Mode Fix</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -14,20 +14,16 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* Кнопки файлов: Голубой + Белая рамка */
-.file-item { 
-    background-color: #add8e6 !important; 
-    border: 3px solid #ffffff !important; 
-    padding: 16px; border-radius: 15px; margin-bottom: 12px; cursor: pointer; 
-}
+/* ФАЙЛЫ */
+.file-item { background-color: #add8e6 !important; border: 3px solid #ffffff !important; padding: 16px; border-radius: 15px; margin-bottom: 12px; cursor: pointer; }
 .file-name { color: #000 !important; font-weight: 900; font-size: 18px; text-align: center; }
 
-/* Поиск внутри карточки */
-.search-wrapper { width: 90%; display: flex !important; margin-bottom: 10px; flex-shrink: 0; }
+/* ПОИСК */
+.search-wrapper { width: 100%; display: flex !important; margin-bottom: 10px; flex-shrink: 0; }
 .inner-search { flex: 1; padding: 10px; border-radius: 10px 0 0 10px; border: 2px solid #6366f1; background: #0f172a; color: white; font-size: 14px; outline: none; }
 .search-btn { width: 70px; background: #facc15; color: #000; border: 2px solid #6366f1; border-left: none; border-radius: 0 10px 10px 0; font-weight: 900; font-size: 11px; cursor: pointer; }
 
-/* Анимация через JS */
+/* РАБОЧАЯ АНИМАЦИЯ ИЗ v75 */
 .card-body { 
     width: 100%; height: 380px; background: #1e293b; border-radius: 24px; 
     border: 2px solid #6366f1; padding: 15px; display: flex; flex-direction: column; 
@@ -43,7 +39,10 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .word-sub { font-size: 18px; color: #6366f1; margin-top: 15px; }
 .btn-voice { background: transparent; border: 2px solid #6366f1; color: #6366f1; padding: 10px 25px; border-radius: 50px; margin-bottom: 15px; cursor: pointer; font-weight: bold; }
 
-.btn { background: #6366f1; color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
+/* КНОПКИ */
+.btn { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
+.btn-active { background: #6366f1 !important; color: white !important; border: none !important; }
+.btn-go { background: #22c55e !important; color: #000 !important; margin-top: 20px; }
 .cat-card { background: #1e293b; border-radius: 16px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid #334155; }
 </style>
 </head>
@@ -60,6 +59,7 @@ function speak(text) {
 }
 
 function fetchFileList() {
+    state.q = ''; 
     fetch('https://api.github.com/repos/'+GITHUB_USER+'/'+GITHUB_REPO+'/contents/')
     .then(function(res){return res.json();}).then(function(data){
         state.availableFiles = data.filter(function(f){return f.name.indexOf('.txt')!==-1;});
@@ -69,7 +69,7 @@ function fetchFileList() {
 
 function loadFile(url) {
     fetch(url).then(function(res){return res.text();}).then(function(text){
-        parseData(text); state.screen = 'cats'; render();
+        parseData(text); state.q = ''; state.screen = 'cats'; render();
     });
 }
 
@@ -89,24 +89,27 @@ function runSearch(val) {
 
 function handleFlip() {
     var card = document.getElementById('main-card');
-    card.style.transform = 'scaleX(0)'; // Схлопываем
+    card.style.transform = 'scaleX(0)'; 
     setTimeout(function() {
         state.isFlipped = !state.isFlipped;
         render();
         var newCard = document.getElementById('main-card');
         newCard.style.transform = 'scaleX(0)';
         setTimeout(function() {
-            newCard.style.transform = 'scaleX(1)'; // Разворачиваем
+            newCard.style.transform = 'scaleX(1)'; 
         }, 50);
     }, 200);
 }
+
+function setMode(m) { state.mode = m; render(); }
+function resetToCats() { state.q = ''; state.screen = 'cats'; render(); }
 
 function render() {
     var app = document.getElementById('app'); var html = '';
     if (state.screen === 'start') {
         html += '<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header><div class="scr scroll"><h2 style="text-align:center; margin-bottom:20px; color:#fff">Привет, Михалыч!</h2>';
         if (state.availableFiles.length === 0) {
-            html += '<button class="btn" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>';
+            html += '<button class="btn btn-active" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>';
         } else {
             for (var i = 0; i < state.availableFiles.length; i++) {
                 var f = state.availableFiles[i];
@@ -120,14 +123,18 @@ function render() {
             var first = DICT.filter(function(w){return w.cat===cats[k]})[0];
             catsHtml += '<div class="cat-card" onclick="openSetup(\''+cats[k]+'\')"><div style="font-size:22px; margin-right:12px">'+(first.icon||'📚')+'</div><div>'+cats[k]+'</div></div>';
         }
-        html += '<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header><div class="scr"><div class="search-wrapper"><button onclick="state.screen=\'start\';render()" style="background:#facc15; border:none; border-radius:10px; width:45px; margin-right:8px; font-weight:bold">▲</button><input type="text" id="catSearch" class="inner-search" placeholder="🔍 Поиск..." value="'+state.q+'"><button class="search-btn" onclick="runSearch(document.getElementById(\'catSearch\').value)">Искать</button></div><div id="list-area" class="scroll">'+(state.q ? "" : catsHtml)+'</div></div>';
+        html += '<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header><div class="scr"><div class="search-wrapper"><button onclick="state.q=\'\';state.screen=\'start\';render()" style="background:#facc15; border:none; border-radius:10px; width:45px; margin-right:8px; font-weight:bold">▲</button><input type="text" id="catSearch" class="inner-search" placeholder="🔍 Поиск..." value="'+state.q+'"><button class="search-btn" onclick="runSearch(document.getElementById(\'catSearch\').value)">Искать</button></div><div id="list-area" class="scroll">'+(state.q ? "" : catsHtml)+'</div></div>';
     } else if (state.screen === 'setup') {
-        html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr"><div style="background:#1e293b; padding:20px; border-radius:20px; text-align:center; border:1px solid #6366f1"><button class="btn" onclick="state.mode=\'he\';render()">Иврит → Перевод</button><button class="btn" style="background:transparent; border: 1px solid #334155; color: #94a3b8" onclick="state.mode=\'tr\';render()">Транскрипция → Перевод</button><button class="btn" style="margin-top:20px; background:#22c55e; color:#000" onclick="startFlash()">ПОГНАЛИ</button><button onclick="state.screen=\'cats\';render()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>';
+        html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr"><div style="background:#1e293b; padding:20px; border-radius:20px; text-align:center; border:1px solid #6366f1">';
+        html += '<button class="btn '+(state.mode==='he'?'btn-active':'')+'" onclick="setMode(\'he\')">Иврит → Перевод</button>';
+        html += '<button class="btn '+(state.mode==='tr'?'btn-active':'')+'" onclick="setMode(\'tr\')">Транскрипция → Перевод</button>';
+        html += '<button class="btn btn-go" onclick="startFlash()">ПОГНАЛИ</button>';
+        html += '<button onclick="resetToCats()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>';
     } else if (state.screen === 'flash') {
         var w = state.words[state.idx];
         var sId = state.isFlipped ? 'sb' : 'sf';
         html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr">';
-        html += '<div class="flash-top"><button style="background:#facc15; border:none; border-radius:10px; width:45px; height:45px; font-weight:bold" onclick="state.screen=\'cats\';render()">▲</button><div style="font-size:20px; font-weight:bold; color:#94a3b8">'+(state.idx+1)+' / '+state.words.length+'</div></div>';
+        html += '<div class="flash-top"><button style="background:#facc15; border:none; border-radius:10px; width:45px; height:45px; font-weight:bold" onclick="resetToCats()">▲</button><div style="font-size:20px; font-weight:bold; color:#94a3b8">'+(state.idx+1)+' / '+state.words.length+'</div></div>';
         html += '<div style="position:relative; width:100%; flex:1; display:flex; align-items:center; justify-content:center;">';
         html += '<button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button>';
         html += '<div id="main-card" class="card-body" onclick="handleFlip()" style="border-color:'+(state.isFlipped?'#4ade80':'#6366f1')+'">';
