@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v53 - Search OK</title>
+<title>🇮🇱 Иврит 1010 v56 - Search Button Final</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 24px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -14,18 +14,18 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
 .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* КОМБО-ПОИСК В КАРТОЧКЕ */
-.search-box { display: flex; width: 90%; gap: 5px; margin-bottom: 15px; }
+/* СТИЛЬ СТРОКИ ПОИСКА */
+.search-wrapper { width: 100%; margin-bottom: 15px; display: flex; align-items: stretch; }
 .inner-search { 
-    flex: 1; padding: 10px; border-radius: 10px 0 0 10px; 
-    border: 1px solid rgba(99, 102, 241, 0.5); 
-    background: rgba(15, 23, 42, 0.6); color: white; 
-    font-size: 15px; outline: none;
+    flex: 1; padding: 12px; border-radius: 12px 0 0 12px; 
+    border: 2px solid var(--accent); background: #0f172a; color: white; 
+    font-size: 16px; outline: none; min-width: 0;
 }
 .search-btn { 
-    background: var(--yellow); color: #000; border: none; 
-    padding: 0 12px; border-radius: 0 10px 10px 0; 
-    font-weight: 800; font-size: 12px; cursor: pointer;
+    padding: 0 15px; background: var(--yellow); color: #000; 
+    border: 2px solid var(--accent); border-left: none; 
+    border-radius: 0 12px 12px 0; font-weight: 900; font-size: 13px; 
+    cursor: pointer; white-space: nowrap;
 }
 
 /* Навигация */
@@ -34,7 +34,7 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
 
 /* 3D АНИМАЦИЯ */
 .flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; }
-.flip-container { perspective: 1000px; width: 100%; height: 400px; }
+.flip-container { perspective: 1000px; width: 100%; height: 380px; }
 .flipper { position: relative; width: 100%; height: 100%; transition: 0.6s; transform-style: preserve-3d; cursor: pointer; }
 .flipper.flipped { transform: rotateY(180deg); }
 
@@ -43,7 +43,7 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
     backface-visibility: hidden; 
     display: flex; flex-direction: column; align-items: center; justify-content: center; 
     background: var(--bg-card); border-radius: var(--radius); 
-    border: 2px solid rgba(99, 102, 241, 0.4); padding: 20px; 
+    border: 2px solid rgba(99, 102, 241, 0.4); padding: 15px; 
 }
 .back { transform: rotateY(180deg); border-color: #4ade80; }
 
@@ -51,10 +51,10 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
 .side-prev { left: -5px; }
 .side-next { right: -5px; }
 
-.emoji-box { font-size: 55px; margin-bottom: 10px; }
-.word-main { font-size: 36px; font-weight: 800; text-align: center; line-height: 1.2; }
-.word-sub { font-size: 18px; color: var(--accent); margin-top: 15px; text-align: center; }
-.btn-voice { background: rgba(99, 102, 241, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 50px; margin-bottom: 15px; cursor: pointer; font-weight: bold; }
+.emoji-box { font-size: 50px; margin-bottom: 5px; }
+.word-main { font-size: 34px; font-weight: 800; text-align: center; line-height: 1.2; }
+.word-sub { font-size: 18px; color: var(--accent); margin-top: 10px; text-align: center; }
+.btn-voice { background: rgba(99, 102, 241, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
 
 .btn { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
 .cat-card, .search-res-card { background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
@@ -104,9 +104,10 @@ function parseData(content) {
     });
 }
 
-function runSearch(val) {
-    if(!val) return;
-    state.q = val.toLowerCase();
+function runSearch(id) {
+    const el = document.getElementById(id);
+    if(!el || !el.value) return;
+    state.q = el.value.toLowerCase();
     state.screen = 'cats';
     render();
 }
@@ -127,12 +128,10 @@ function render() {
         const cats = [...new Set(DICT.map(w => w.cat))];
         app.innerHTML = `<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header>
             <div class="scr">
-                <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px">
-                    <button class="btn-yellow-up" onclick="state.screen='start';render()">▲</button>
-                    <div class="search-box" style="margin-bottom:0; flex:1">
-                        <input type="text" id="catSearch" class="inner-search" placeholder="🔍 Поиск..." value="${state.q}">
-                        <button class="search-btn" onclick="runSearch(document.getElementById('catSearch').value)">OK</button>
-                    </div>
+                <div class="search-wrapper">
+                    <button class="btn-yellow-up" style="margin-right:10px" onclick="state.screen='start';render()">▲</button>
+                    <input type="text" id="catSearch" class="inner-search" placeholder="🔍 Поиск..." value="${state.q}">
+                    <button class="search-btn" onclick="runSearch('catSearch')">Искать</button>
                 </div>
                 <div id="list-area" class="scroll">${state.q ? "" : renderCatsHtml(cats)}</div>
             </div>`;
@@ -147,9 +146,9 @@ function render() {
     } else if (state.screen === 'flash') {
         const w = state.words[state.idx];
         const searchUI = (side) => `
-            <div class="search-box" onclick="event.stopPropagation()">
+            <div class="search-wrapper" onclick="event.stopPropagation()">
                 <input type="text" id="inp_${side}" class="inner-search" placeholder="🔍 Найти...">
-                <button class="search-btn" onclick="runSearch(document.getElementById('inp_${side}').value)">OK</button>
+                <button class="search-btn" onclick="runSearch('inp_${side}')">Искать</button>
             </div>`;
 
         app.innerHTML = `<header class="hdr"><div class="hdr-title">${state.currentCat}</div></header>
