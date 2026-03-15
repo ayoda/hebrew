@@ -3,30 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v91 - Clean Spin Fix</title>
+<title>🇮🇱 Иврит 1010 v92 - V10 Hybrid</title>
 <style>
-:root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; }
+:root {
+  --bg-main: #0f172a;
+  --bg-card: #1e293b;
+  --accent: #6366f1;
+  --yellow: #facc15;
+  --text-main: #f1f5f9;
+  --radius: 16px;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sans-serif;overflow:hidden}
 #app{height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column}
+
 .hdr{background:rgba(30,41,59,0.9);padding:10px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0}
 .hdr-title{font-size:20px;font-weight:800;color:var(--accent)}
 
 .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* ФАЙЛЫ: Голубой + Белая рамка */
+/* Кнопки файлов из v85 */
 .file-item { background: #add8e6 !important; border: 3px solid #ffffff !important; padding: 16px; border-radius: 15px; margin-bottom: 12px; cursor: pointer; }
 .file-name { color: #000 !important; font-weight: 900; font-size: 18px; text-align: center; }
 
-/* ПОИСК: Вынесен за пределы карточки, чтобы не мешать 3D */
+/* Поиск - СТРОГО ВНЕ КАРТОЧКИ */
 .search-wrapper { width: 100%; display: flex !important; margin-bottom: 12px; flex-shrink:0; }
 .inner-search { flex: 1; padding: 10px; border-radius: 10px 0 0 10px; border: 2px solid var(--accent); background: var(--bg-main); color: white; font-size: 14px; outline: none; }
 .search-btn { width: 75px; background: var(--yellow); color: #000; border: 2px solid var(--accent); border-left: none; border-radius: 0 10px 10px 0; font-weight: 900; font-size: 11px; cursor: pointer; }
 
-/* 3D-МЕХАНИЗМ ИЗ СТАБИЛЬНЫХ ВЕРСИЙ */
+/* 3D СТРУКТУРА */
 .flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; perspective: 1000px; }
-.flipper { position: relative; width: 100%; height: 350px; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+.flipper { position: relative; width: 100%; height: 380px; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; width: 100%; }
 .flipper.flipped { transform: rotateY(180deg); }
 
 .front, .back { 
@@ -42,14 +50,12 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
 .side-next { right: -5px; }
 
 .emoji-box { font-size: 60px; margin-bottom: 10px; }
-.word-main { font-size: 34px; font-weight: 800; text-align: center; }
+.word-main { font-size: 36px; font-weight: 800; text-align: center; }
 .word-sub { font-size: 18px; color: var(--accent); margin-top: 10px; }
 .btn-voice { background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 10px 25px; border-radius: 50px; margin-top: 15px; cursor: pointer; font-weight: bold; }
 
-/* КНОПКИ */
 .btn { background: var(--bg-card); color: var(--text-main); border: 1px solid #334155; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
 .btn-active { background: var(--accent) !important; color: white !important; border: none !important; }
-.btn-go { background: #22c55e !important; color: #000 !important; margin-top: 20px; }
 </style>
 </head>
 <body>
@@ -99,7 +105,7 @@ function resetToCats() { state.q = ''; state.screen = 'cats'; render(); }
 function render() {
     var app = document.getElementById('app'); var html = '';
     if (state.screen === 'start') {
-        html += '<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header><div class="scr scroll"><h2 style="text-align:center; margin-bottom:20px; color:#fff">Шалом, Михалыч!</h2>';
+        html += '<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header><div class="scr scroll"><h2 style="text-align:center; margin-bottom:20px; color:#fff">Привет, Михалыч!</h2>';
         if (state.availableFiles.length === 0) {
             html += '<button class="btn btn-active" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>';
         } else {
@@ -120,13 +126,13 @@ function render() {
         html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr"><div style="background:var(--bg-card); padding:20px; border-radius:20px; text-align:center; border:1px solid var(--accent)">';
         html += '<button class="btn '+(state.mode==='he'?'btn-active':'')+'" onclick="setMode(\'he\')">Иврит → Перевод</button>';
         html += '<button class="btn '+(state.mode==='tr'?'btn-active':'')+'" onclick="setMode(\'tr\')">Транскрипция → Перевод</button>';
-        html += '<button class="btn btn-go" onclick="startFlash()">ПОГНАЛИ</button>';
+        html += '<button class="btn" style="background:#22c55e; color:#000; margin-top:20px" onclick="startFlash()">ПОГНАЛИ</button>';
         html += '<button class="btn" onclick="resetToCats()" style="background:transparent; color:#94a3b8; border:1px solid #334155; margin-top:10px">Назад</button></div></div>';
     } else if (state.screen === 'flash') {
         var w = state.words[state.idx];
         html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr">';
-        html += '<div class="search-wrapper"><button style="background:var(--yellow); border:none; border-radius:10px; width:45px; height:42px; font-weight:bold; margin-right:8px" onclick="resetToCats()">▲</button><input type="text" id="flSearch" class="inner-search" placeholder="🔍 Найти слово..."><button class="search-btn" onclick="runSearch(document.getElementById(\'flSearch\').value)">Искать</button></div>';
-        html += '<div style="text-align:center; font-size:16px; font-weight:bold; color:var(--text-muted); margin-bottom:5px">'+(state.idx+1)+' / '+state.words.length+'</div>';
+        html += '<div class="search-wrapper"><button style="background:var(--yellow); border:none; border-radius:10px; width:45px; height:42px; font-weight:bold; margin-right:8px" onclick="resetToCats()">▲</button><input type="text" id="flSearch" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(document.getElementById(\'flSearch\').value)">Искать</button></div>';
+        html += '<div style="text-align:center; font-size:16px; font-weight:bold; color:#94a3b8; margin-bottom:5px">'+(state.idx+1)+' / '+state.words.length+'</div>';
         html += '<div class="flash-wrap"><button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button>';
         html += '<div class="flipper '+(state.isFlipped?'flipped':'')+'" onclick="state.isFlipped=!state.isFlipped; render()">';
         html += '<div class="front"><div class="emoji-box">'+w.icon+'</div><button class="btn-voice" onclick="event.stopPropagation(); speak(\''+w.he+'\')">🔊 СЛУШАТЬ</button><div class="word-main">'+(state.mode==='he'?w.he:w.tr)+'</div><div class="word-sub">['+w.tr+']</div></div>';
