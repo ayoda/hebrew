@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v64 - Perfect Edition</title>
+<title>🇮🇱 Иврит 1010 v65 - Fixed & Beautiful</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 24px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -14,7 +14,7 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
 .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* Кнопки файлов: нежно-голубой фон + жирная белая рамка */
+/* Кнопки файлов: голубой фон + белая рамка */
 .file-item { 
     background: #add8e6 !important; 
     border: 3px solid #ffffff !important; 
@@ -54,7 +54,7 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
 .word-sub { font-size: 16px; color: var(--accent); margin-top: 10px; text-align: center; }
 .btn-voice { background: rgba(99, 102, 241, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 8px 18px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
 
-.btn { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
+.btn { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
 .cat-card, .search-res-card { background: var(--bg-card); border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
 </style>
 </head>
@@ -77,9 +77,9 @@ function speak(text) {
 
 async function fetchFileList() {
     try {
-        const response = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
+        const response = await fetch('https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/');
         const data = await response.json();
-        state.availableFiles = data.filter(f => f.name.indexOf('.txt') !== -1);
+        state.availableFiles = data.filter(function(f) { return f.name.indexOf('.txt') !== -1; });
         render();
     } catch (err) { alert("GitHub Error"); }
 }
@@ -97,12 +97,12 @@ async function loadFile(url) {
 function parseData(content) {
     const lines = content.split('\n');
     DICT = [];
-    lines.forEach(line => {
-        if (line.indexOf(';') !== -1) {
-            const p = line.split(';');
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf(';') !== -1) {
+            const p = lines[i].split(';');
             DICT.push({ cat: p[0].trim(), he: p[1].trim(), tr: p[2].trim(), ru: p[3].trim(), icon: (p[4] || "📖").trim() });
         }
-    });
+    }
 }
 
 function runSearch(id) {
@@ -120,75 +120,33 @@ function render() {
         if (state.availableFiles.length === 0) {
             filesHtml = '<button class="btn" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>';
         } else {
-            state.availableFiles.forEach(f => {
-                filesHtml += `<div class="file-item" onclick="loadFile('${f.download_url}')"><span style="font-size:20px">📄</span> <span class="file-name">${f.name}</span></div>`;
-            });
+            for (let i = 0; i < state.availableFiles.length; i++) {
+                let f = state.availableFiles[i];
+                filesHtml += '<div class="file-item" onclick="loadFile(\'' + f.download_url + '\')"><span style="font-size:20px">📄</span> <span class="file-name">' + f.name + '</span></div>';
+            }
         }
-        app.innerHTML = `<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header>
-            <div class="scr scroll">
-                <h2 style="text-align:center; margin-bottom:20px">Привет, Михалыч!</h2>
-                <div id="file-list">${filesHtml}</div>
-            </div>`;
+        app.innerHTML = '<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header><div class="scr scroll"><h2 style="text-align:center; margin-bottom:20px">Привет, Михалыч!</h2><div id="file-list">' + filesHtml + '</div></div>';
     } else if (state.screen === 'cats') {
         const cats = [];
-        DICT.forEach(w => { if (cats.indexOf(w.cat) === -1) cats.push(w.cat); });
+        for (let i = 0; i < DICT.length; i++) {
+            if (cats.indexOf(DICT[i].cat) === -1) cats.push(DICT[i].cat);
+        }
         let catsHtml = '';
-        cats.forEach(c => {
-            const first = DICT.filter(w => w.cat === c)[0];
-            catsHtml += `<div class="cat-card" onclick="openSetup('${c}')"><div style="font-size:18px; margin-right:12px">${first.icon || '📚'}</div><div>${c}</div></div>`;
-        });
-        app.innerHTML = `<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header>
-            <div class="scr">
-                <div class="search-wrapper">
-                    <button class="btn-yellow-up" style="margin-right:8px" onclick="state.screen='start';render()">▲</button>
-                    <input type="text" id="catSearch" class="inner-search" placeholder="🔍 Поиск..." value="${state.q}">
-                    <button class="search-btn" onclick="runSearch('catSearch')">Искать</button>
-                </div>
-                <div id="list-area" class="scroll">${state.q ? "" : catsHtml}</div>
-            </div>`;
+        for (let i = 0; i < cats.length; i++) {
+            let c = cats[i];
+            let first = DICT.filter(function(w) { return w.cat === c; })[0];
+            catsHtml += '<div class="cat-card" onclick="openSetup(\'' + c + '\')"><div style="font-size:18px; margin-right:12px">' + (first.icon || '📚') + '</div><div>' + c + '</div></div>';
+        }
+        app.innerHTML = '<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header><div class="scr"><div class="search-wrapper"><button class="btn-yellow-up" style="margin-right:8px" onclick="state.screen=\'start\';render()">▲</button><input type="text" id="catSearch" class="inner-search" placeholder="🔍 Поиск..." value="' + state.q + '"><button class="search-btn" onclick="runSearch(\'catSearch\')">Искать</button></div><div id="list-area" class="scroll">' + (state.q ? "" : catsHtml) + '</div></div>';
         if (state.q) renderSearch();
     } else if (state.screen === 'setup') {
-        app.innerHTML = `<header class="hdr"><div class="hdr-title">${state.currentCat}</div></header>
-            <div class="scr"><div style="background:var(--bg-card); padding:20px; border-radius:20px; text-align:center; border:1px solid var(--accent)">
-            <button class="btn" onclick="state.mode='he';render()">Иврит → Перевод</button>
-            <button class="btn" style="background:transparent; border: 1px solid #334155; color: #94a3b8" onclick="state.mode='tr';render()">Транскрипция → Перевод</button>
-            <button class="btn" style="margin-top:20px; background:#22c55e; color:#000" onclick="startFlash()">ПОГНАЛИ</button>
-            <button onclick="state.screen='cats';render()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>`;
+        app.innerHTML = '<header class="hdr"><div class="hdr-title">' + state.currentCat + '</div></header><div class="scr"><div style="background:var(--bg-card); padding:20px; border-radius:20px; text-align:center; border:1px solid var(--accent)"><button class="btn" onclick="state.mode=\'he\';render()">Иврит → Перевод</button><button class="btn" style="background:transparent; border: 1px solid #334155; color: #94a3b8" onclick="state.mode=\'tr\';render()">Транскрипция → Перевод</button><button class="btn" style="margin-top:20px; background:#22c55e; color:#000" onclick="startFlash()">ПОГНАЛИ</button><button onclick="state.screen=\'cats\';render()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>';
     } else if (state.screen === 'flash') {
         const w = state.words[state.idx];
-        const searchUI = (side) => `
-            <div class="search-wrapper" onclick="event.stopPropagation()">
-                <input type="text" id="inp_${side}" class="inner-search" placeholder="🔍 Найти...">
-                <button class="search-btn" onclick="runSearch('inp_${side}')">Искать</button>
-            </div>`;
-
-        app.innerHTML = `<header class="hdr"><div class="hdr-title">${state.currentCat}</div></header>
-            <div class="scr">
-                <div class="flash-top">
-                    <button class="btn-yellow-up" onclick="state.screen='cats';render()">▲</button>
-                    <div style="font-size:18px; font-weight:bold; color:#94a3b8">${state.idx + 1} / ${state.words.length}</div>
-                </div>
-                <div class="flash-wrap">
-                    <button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button>
-                    <div class="flip-container">
-                        <div class="flipper ${state.isFlipped ? 'flipped' : ''}" onclick="state.isFlipped = !state.isFlipped; render()">
-                            <div class="front">
-                                ${searchUI('f')}
-                                <div class="emoji-box">${w.icon}</div>
-                                <button class="btn-voice" onclick="event.stopPropagation(); speak('${w.he}')">🔊</button>
-                                <div class="word-main">${state.mode === 'he' ? w.he : w.tr}</div>
-                                <div class="word-sub">[${w.tr}]</div>
-                            </div>
-                            <div class="back">
-                                ${searchUI('b')}
-                                <div class="emoji-box">${w.icon}</div>
-                                <div class="word-main" style="color:#4ade80">${w.ru}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="side-nav side-next" onclick="changeIdx(1)">❯</button>
-                </div>
-            </div>`;
+        const searchUI = function(side) {
+            return '<div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="inp_' + side + '" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(\'inp_' + side + '\')">Искать</button></div>';
+        };
+        app.innerHTML = '<header class="hdr"><div class="hdr-title">' + state.currentCat + '</div></header><div class="scr"><div class="flash-top"><button class="btn-yellow-up" onclick="state.screen=\'cats\';render()">▲</button><div style="font-size:18px; font-weight:bold; color:#94a3b8">' + (state.idx + 1) + ' / ' + state.words.length + '</div></div><div class="flash-wrap"><button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button><div class="flip-container"><div class="flipper ' + (state.isFlipped ? 'flipped' : '') + '" onclick="state.isFlipped = !state.isFlipped; render()"><div class="front">' + searchUI('f') + '<div class="emoji-box">' + w.icon + '</div><button class="btn-voice" onclick="event.stopPropagation(); speak(\'' + w.he + '\')">🔊</button><div class="word-main">' + (state.mode === 'he' ? w.he : w.tr) + '</div><div class="word-sub">[' + w.tr + ']</div></div><div class="back">' + searchUI('b') + '<div class="emoji-box">' + w.icon + '</div><div class="word-main" style="color:#4ade80">' + w.ru + '</div></div></div></div><button class="side-nav side-next" onclick="changeIdx(1)">❯</button></div></div>';
     }
 }
 function renderSearch() {
@@ -196,24 +154,23 @@ function renderSearch() {
     const listArea = document.getElementById('list-area');
     if (!listArea) return;
     let resHtml = '';
-    DICT.forEach(item => {
+    for (let i = 0; i < DICT.length; i++) {
+        let item = DICT[i];
         if (item.he.toLowerCase().indexOf(q) !== -1 || item.ru.toLowerCase().indexOf(q) !== -1 || item.tr.toLowerCase().indexOf(q) !== -1) {
-            resHtml += `<div class="cat-card" onclick="jumpToWord('${item.he}')">
-                <div style="font-size:18px; margin-right:12px">${item.icon}</div>
-                <div class="res-info"><b>${item.he}</b> [${item.tr}]<br><small>${item.ru}</small></div></div>`;
+            resHtml += '<div class="cat-card" onclick="jumpToWord(\'' + item.he + '\')"><div style="font-size:18px; margin-right:12px">' + item.icon + '</div><div class="res-info"><b>' + item.he + '</b> [' + item.tr + ']<br><small>' + item.ru + '</small></div></div>';
         }
-    });
+    }
     listArea.innerHTML = resHtml;
 }
 function jumpToWord(he) {
-    const w = DICT.filter(x => x.he === he)[0];
-    state.currentCat = w.cat; state.words = DICT.filter(x => x.cat === w.cat);
-    state.idx = state.words.findIndex(x => x.he === he);
+    let w = DICT.filter(function(x) { return x.he === he; })[0];
+    state.currentCat = w.cat; state.words = DICT.filter(function(x) { return x.cat === w.cat; });
+    state.idx = state.words.findIndex(function(x) { return x.he === he; });
     state.isFlipped = false; state.screen = 'flash'; render();
 }
 function openSetup(c) { state.currentCat = c; state.screen = 'setup'; render(); }
 function startFlash() {
-    state.words = DICT.filter(w => w.cat === state.currentCat).sort(() => Math.random() - 0.5);
+    state.words = DICT.filter(function(w) { return w.cat === state.currentCat; }).sort(function() { return Math.random() - 0.5; });
     state.idx = 0; state.isFlipped = false; state.screen = 'flash'; render();
 }
 function changeIdx(delta) {
