@@ -3,38 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v56 - Search Button Final</title>
+<title>🇮🇱 Иврит 1010 v57 - Mobile Button Fix</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 24px; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sans-serif;overflow:hidden}
 #app{height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column}
-.hdr{background:rgba(30,41,59,0.9);padding:12px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0}
+.hdr{background:rgba(30,41,59,0.9);padding:10px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0}
 .hdr-title{font-size:18px;font-weight:800;color:var(--accent)}
-.scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
+.scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:10px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* СТИЛЬ СТРОКИ ПОИСКА */
-.search-wrapper { width: 100%; margin-bottom: 15px; display: flex; align-items: stretch; }
+/* ПРИНУДИТЕЛЬНО ВИДИМЫЙ ПОИСК */
+.search-wrapper { 
+    width: 100%; 
+    display: flex !important; 
+    align-items: stretch; 
+    margin-bottom: 12px; 
+    flex-shrink: 0; 
+}
 .inner-search { 
-    flex: 1; padding: 12px; border-radius: 12px 0 0 12px; 
-    border: 2px solid var(--accent); background: #0f172a; color: white; 
-    font-size: 16px; outline: none; min-width: 0;
+    flex: 1; 
+    min-width: 50px; /* Чтобы не вытеснял кнопку */
+    padding: 10px; 
+    border-radius: 12px 0 0 12px; 
+    border: 2px solid var(--accent); 
+    background: #0f172a; 
+    color: white; 
+    font-size: 15px; 
+    outline: none;
 }
 .search-btn { 
-    padding: 0 15px; background: var(--yellow); color: #000; 
-    border: 2px solid var(--accent); border-left: none; 
-    border-radius: 0 12px 12px 0; font-weight: 900; font-size: 13px; 
-    cursor: pointer; white-space: nowrap;
+    width: 80px !important; /* Жесткая ширина для телефона */
+    flex-shrink: 0 !important; /* ЗАПРЕТ ИСЧЕЗНОВЕНИЯ */
+    background: var(--yellow); 
+    color: #000; 
+    border: 2px solid var(--accent); 
+    border-left: none; 
+    border-radius: 0 12px 12px 0; 
+    font-weight: 900; 
+    font-size: 13px; 
+    cursor: pointer;
 }
 
 /* Навигация */
-.flash-top { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 10px; flex-shrink:0; }
-.btn-yellow-up { background: var(--yellow); color: #000; border: none; width: 45px; height: 45px; border-radius: 12px; font-size: 20px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.flash-top { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 8px; flex-shrink:0; }
+.btn-yellow-up { background: var(--yellow); color: #000; border: none; width: 42px; height: 42px; border-radius: 10px; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
 /* 3D АНИМАЦИЯ */
-.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; }
-.flip-container { perspective: 1000px; width: 100%; height: 380px; }
+.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.flip-container { perspective: 1000px; width: 100%; height: 85%; max-height: 380px; }
 .flipper { position: relative; width: 100%; height: 100%; transition: 0.6s; transform-style: preserve-3d; cursor: pointer; }
 .flipper.flipped { transform: rotateY(180deg); }
 
@@ -47,18 +65,18 @@ body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sa
 }
 .back { transform: rotateY(180deg); border-color: #4ade80; }
 
-.side-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.25); border: 1px solid var(--accent); color: white; width: 42px; height: 80px; border-radius: 10px; font-size: 24px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.side-nav { position: absolute; top: 55%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.25); border: 1px solid var(--accent); color: white; width: 40px; height: 70px; border-radius: 8px; font-size: 22px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .side-prev { left: -5px; }
 .side-next { right: -5px; }
 
-.emoji-box { font-size: 50px; margin-bottom: 5px; }
-.word-main { font-size: 34px; font-weight: 800; text-align: center; line-height: 1.2; }
-.word-sub { font-size: 18px; color: var(--accent); margin-top: 10px; text-align: center; }
-.btn-voice { background: rgba(99, 102, 241, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
+.emoji-box { font-size: 45px; margin-bottom: 5px; }
+.word-main { font-size: 32px; font-weight: 800; text-align: center; line-height: 1.1; }
+.word-sub { font-size: 16px; color: var(--accent); margin-top: 10px; text-align: center; }
+.btn-voice { background: rgba(99, 102, 241, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 8px 18px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
 
-.btn { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
-.cat-card, .search-res-card { background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
-.cat-icon { font-size: 24px; margin-right: 15px; background: rgba(99, 102, 241, 0.1); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+.btn { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
+.cat-card, .search-res-card { background: var(--bg-card); border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
+.cat-icon { font-size: 22px; margin-right: 12px; background: rgba(99, 102, 241, 0.1); width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
 </style>
 </head>
 <body>
@@ -129,7 +147,7 @@ function render() {
         app.innerHTML = `<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header>
             <div class="scr">
                 <div class="search-wrapper">
-                    <button class="btn-yellow-up" style="margin-right:10px" onclick="state.screen='start';render()">▲</button>
+                    <button class="btn-yellow-up" style="margin-right:8px" onclick="state.screen='start';render()">▲</button>
                     <input type="text" id="catSearch" class="inner-search" placeholder="🔍 Поиск..." value="${state.q}">
                     <button class="search-btn" onclick="runSearch('catSearch')">Искать</button>
                 </div>
@@ -142,7 +160,7 @@ function render() {
             <button class="btn ${state.mode === 'he' ? '' : 'btn-sec'}" onclick="state.mode='he';render()">Иврит → Перевод</button>
             <button class="btn ${state.mode === 'tr' ? '' : 'btn-sec'}" onclick="state.mode='tr';render()">Транскрипция → Перевод</button>
             <button class="btn" style="margin-top:20px" onclick="startFlash()">ПОГНАЛИ</button>
-            <button class="btn-sec" onclick="state.screen='cats';render()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>`;
+            <button onclick="state.screen='cats';render()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>`;
     } else if (state.screen === 'flash') {
         const w = state.words[state.idx];
         const searchUI = (side) => `
@@ -186,7 +204,7 @@ function renderSearch() {
     if (!listArea) return;
     const filtered = DICT.filter(w => w.he.toLowerCase().includes(q) || w.ru.toLowerCase().includes(q) || w.tr.toLowerCase().includes(q));
     listArea.innerHTML = filtered.map(w => `<div class="search-res-card" onclick="jumpToWord('${w.he}')">
-        <div class="cat-icon" style="font-size:20px">${w.icon}</div>
+        <div class="cat-icon" style="font-size:18px">${w.icon}</div>
         <div class="res-info"><b>${w.he}</b> [${w.tr}]<br><small>${w.ru}</small></div></div>`).join('');
 }
 function renderCatsHtml(cats) {
