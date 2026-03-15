@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v95 - Mode Fix</title>
+<title>🇮🇱 Иврит 1010 v96 - The Final Polish</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -14,16 +14,20 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* ФАЙЛЫ */
-.file-item { background-color: #add8e6 !important; border: 3px solid #ffffff !important; padding: 16px; border-radius: 15px; margin-bottom: 12px; cursor: pointer; }
+/* Файлы Михалыча: Голубой + Белая рамка */
+.file-item { 
+    background-color: #add8e6 !important; 
+    border: 3px solid #ffffff !important; 
+    padding: 16px; border-radius: 15px; margin-bottom: 12px; cursor: pointer; 
+}
 .file-name { color: #000 !important; font-weight: 900; font-size: 18px; text-align: center; }
 
-/* ПОИСК */
+/* Поиск */
 .search-wrapper { width: 100%; display: flex !important; margin-bottom: 10px; flex-shrink: 0; }
 .inner-search { flex: 1; padding: 10px; border-radius: 10px 0 0 10px; border: 2px solid #6366f1; background: #0f172a; color: white; font-size: 14px; outline: none; }
 .search-btn { width: 70px; background: #facc15; color: #000; border: 2px solid #6366f1; border-left: none; border-radius: 0 10px 10px 0; font-weight: 900; font-size: 11px; cursor: pointer; }
 
-/* РАБОЧАЯ АНИМАЦИЯ ИЗ v75 */
+/* ТА САМАЯ РАБОЧАЯ АНИМАЦИЯ */
 .card-body { 
     width: 100%; height: 380px; background: #1e293b; border-radius: 24px; 
     border: 2px solid #6366f1; padding: 15px; display: flex; flex-direction: column; 
@@ -39,7 +43,7 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .word-sub { font-size: 18px; color: #6366f1; margin-top: 15px; }
 .btn-voice { background: transparent; border: 2px solid #6366f1; color: #6366f1; padding: 10px 25px; border-radius: 50px; margin-bottom: 15px; cursor: pointer; font-weight: bold; }
 
-/* КНОПКИ */
+/* КНОПКИ ВЫБОРА РЕЖИМА */
 .btn { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
 .btn-active { background: #6366f1 !important; color: white !important; border: none !important; }
 .btn-go { background: #22c55e !important; color: #000 !important; margin-top: 20px; }
@@ -59,7 +63,7 @@ function speak(text) {
 }
 
 function fetchFileList() {
-    state.q = ''; 
+    state.q = ''; render();
     fetch('https://api.github.com/repos/'+GITHUB_USER+'/'+GITHUB_REPO+'/contents/')
     .then(function(res){return res.json();}).then(function(data){
         state.availableFiles = data.filter(function(f){return f.name.indexOf('.txt')!==-1;});
