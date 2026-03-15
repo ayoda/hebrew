@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v72 - THE RETURN</title>
+<title>🇮🇱 Иврит 1010 v73 - The Iron Spin</title>
 <style>
 :root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -14,7 +14,7 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
 .scroll{flex:1;overflow-y:auto}
 
-/* ФАЙЛЫ: Голубой фон + Жирная белая рамка */
+/* ФАЙЛЫ: Нежно-голубой фон + Жирная белая рамка */
 .file-item { 
     background-color: #add8e6 !important; 
     border: 3px solid #ffffff !important; 
@@ -22,15 +22,15 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 }
 .file-name { color: #000000 !important; font-weight: 900; font-size: 18px; text-align: center; }
 
-/* ПОИСК В КАРТОЧКЕ */
-.search-wrapper { width: 100%; display: flex !important; margin-bottom: 10px; flex-shrink: 0; }
+/* ПОИСК В КАРТОЧКЕ (Строкой выше эмодзи) */
+.search-wrapper { width: 100%; display: flex !important; margin-bottom: 15px; flex-shrink: 0; }
 .inner-search { flex: 1; padding: 10px; border-radius: 10px 0 0 10px; border: 2px solid #6366f1; background: #0f172a; color: white; font-size: 14px; outline: none; }
-.search-btn { width: 70px; background: #facc15; color: #000; border: 2px solid #6366f1; border-left: none; border-radius: 0 10px 10px 0; font-weight: 900; font-size: 11px; cursor: pointer; }
+.search-btn { width: 80px; background: #facc15; color: #000; border: 2px solid #6366f1; border-left: none; border-radius: 0 10px 10px 0; font-weight: 900; font-size: 12px; cursor: pointer; }
 
-/* 3D ПОВОРОТ: Классика */
+/* 3D ПОВОРОТ: Жесткая фиксация оси */
 .flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; perspective: 1000px; }
 .flipper { 
-    position: relative; width: 100%; height: 380px; 
+    position: relative; width: 100%; height: 400px; 
     transition: transform 0.6s; transform-style: preserve-3d; 
 }
 .flipper.flipped { transform: rotateY(180deg); }
@@ -39,18 +39,18 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
     position: absolute; width: 100%; height: 100%; 
     backface-visibility: hidden; -webkit-backface-visibility: hidden;
     display: flex; flex-direction: column; align-items: center; justify-content: center; 
-    background: #1e293b; border-radius: 24px; border: 2px solid #6366f1; padding: 15px; 
+    background: #1e293b; border-radius: 24px; border: 2px solid #6366f1; padding: 20px; 
 }
 .back { transform: rotateY(180deg); border-color: #4ade80; }
 
-.side-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.3); border: 1px solid #6366f1; color: white; width: 40px; height: 80px; border-radius: 10px; font-size: 24px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.side-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.4); border: 1px solid #6366f1; color: white; width: 42px; height: 80px; border-radius: 10px; font-size: 26px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .side-prev { left: -5px; }
 .side-next { right: -5px; }
 
-.emoji-box { font-size: 50px; margin-bottom: 5px; }
-.word-main { font-size: 32px; font-weight: 800; text-align: center; }
-.word-sub { font-size: 16px; color: #6366f1; margin-top: 10px; }
-.btn-voice { background: transparent; border: 1px solid #6366f1; color: #6366f1; padding: 8px 20px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
+.emoji-box { font-size: 60px; margin-bottom: 10px; }
+.word-main { font-size: 36px; font-weight: 800; text-align: center; line-height: 1.2; }
+.word-sub { font-size: 18px; color: #6366f1; margin-top: 15px; text-align: center; }
+.btn-voice { background: transparent; border: 2px solid #6366f1; color: #6366f1; padding: 10px 25px; border-radius: 50px; margin-bottom: 15px; cursor: pointer; font-weight: bold; }
 
 .btn { background: #6366f1; color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
 .cat-card { background: #1e293b; border-radius: 16px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid #334155; }
@@ -77,7 +77,7 @@ function fetchFileList() {
 }
 
 function loadFile(url) {
-    fetch(url).then(function(res){return res.text();}).then(function(text){
+    fetch(url).then(function(res){return res.json ? res.text() : '';}).then(function(text){
         parseData(text); state.screen = 'cats'; render();
     });
 }
@@ -99,7 +99,7 @@ function runSearch(val) {
 function render() {
     var app = document.getElementById('app'); var html = '';
     if (state.screen === 'start') {
-        html += '<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header><div class="scr scroll"><h2 style="text-align:center; margin-bottom:20px; color:#fff">Привет, Михалыч!</h2>';
+        html += '<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header><div class="scr scroll"><h2 style="text-align:center; margin-bottom:20px; color:#fff">Шалом, Михалыч!</h2>';
         if (state.availableFiles.length === 0) {
             html += '<button class="btn" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>';
         } else {
@@ -120,14 +120,14 @@ function render() {
         html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr"><div style="background:#1e293b; padding:20px; border-radius:20px; text-align:center; border:1px solid #6366f1"><button class="btn" onclick="state.mode=\'he\';render()">Иврит → Перевод</button><button class="btn" style="background:transparent; border: 1px solid #334155; color: #94a3b8" onclick="state.mode=\'tr\';render()">Транскрипция → Перевод</button><button class="btn" style="margin-top:20px; background:#22c55e; color:#000" onclick="startFlash()">ПОГНАЛИ</button><button onclick="state.screen=\'cats\';render()" style="background:transparent; border: 1px solid #334155; color: #94a3b8; padding: 12px; margin-top: 10px; border-radius: 12px; cursor: pointer; width: 100%;">Назад</button></div></div>';
     } else if (state.screen === 'flash') {
         var w = state.words[state.idx];
-        var searchUI = function(id) { return '<div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="'+id+'" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(document.getElementById(\''+id+'\').value)">Искать</button></div>'; };
+        var searchUI = function(id) { return '<div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="'+id+'" class="inner-search" placeholder="🔍 Искать слово..."><button class="search-btn" onclick="runSearch(document.getElementById(\''+id+'\').value)">Искать</button></div>'; };
         html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr">';
+        html += '<div class="flash-top"><button class="btn-yellow-up" style="background:#facc15; border:none; border-radius:10px; width:45px; height:45px; font-weight:bold" onclick="state.screen=\'cats\';render()">▲</button><div style="font-size:20px; font-weight:bold; color:#94a3b8">'+(state.idx+1)+' / '+state.words.length+'</div></div>';
         html += '<div class="flash-wrap"><button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button>';
         html += '<div class="flipper '+(state.isFlipped?'flipped':'')+'" onclick="state.isFlipped=!state.isFlipped; render()">';
-        html += '<div class="front">'+searchUI('inf')+'<div class="emoji-box">'+w.icon+'</div><button class="btn-voice" onclick="event.stopPropagation(); speak(\''+w.he+'\')">🔊</button><div class="word-main">'+(state.mode==='he'?w.he:w.tr)+'</div><div class="word-sub">['+w.tr+']</div></div>';
+        html += '<div class="front">'+searchUI('inf')+'<div class="emoji-box">'+w.icon+'</div><button class="btn-voice" onclick="event.stopPropagation(); speak(\''+w.he+'\')">🔊 СЛУШАТЬ</button><div class="word-main">'+(state.mode==='he'?w.he:w.tr)+'</div><div class="word-sub">['+w.tr+']</div></div>';
         html += '<div class="back">'+searchUI('inb')+'<div class="emoji-box">'+w.icon+'</div><div class="word-main" style="color:#4ade80">'+w.ru+'</div></div>';
-        html += '</div><button class="side-nav side-next" onclick="changeIdx(1)">❯</button></div>';
-        html += '</div>';
+        html += '</div><button class="side-nav side-next" onclick="changeIdx(1)">❯</button></div></div>';
     }
     app.innerHTML = html; if (state.screen === 'cats' && state.q) renderSearch();
 }
