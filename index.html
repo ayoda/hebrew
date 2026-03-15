@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v68 - Hard 3D Fix</title>
+<title>🇮🇱 Иврит 1010 v69 - THE SPIN</title>
 <style>
-:root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; --radius: 24px; }
+:root { --bg-main: #0f172a; --bg-card: #1e293b; --accent: #6366f1; --yellow: #facc15; --text-main: #f1f5f9; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflow:hidden}
 #app{height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column}
@@ -16,8 +16,7 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 
 /* ФАЙЛЫ: Голубой фон + Жирная белая рамка */
 .file-item { 
-    background: #add8e6 !important; 
-    border: 3px solid #ffffff !important; 
+    background: #add8e6 !important; border: 3px solid #ffffff !important; 
     padding: 16px; border-radius: 15px; margin-bottom: 12px; 
     cursor: pointer; display: flex; align-items: center; gap: 12px;
 }
@@ -28,41 +27,36 @@ body{height:100%;background:#0f172a;color:#f1f5f9;font-family:sans-serif;overflo
 .inner-search { flex: 1; min-width: 50px; padding: 10px; border-radius: 12px 0 0 12px; border: 2px solid #6366f1; background: #0f172a; color: white; font-size: 15px; outline: none; }
 .search-btn { width: 85px !important; flex-shrink: 0 !important; background: #facc15; color: #000; border: 2px solid #6366f1; border-left: none; border-radius: 0 12px 12px 0; font-weight: 900; font-size: 13px; cursor: pointer; }
 
-/* НАВИГАЦИЯ */
-.flash-top { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 8px; flex-shrink:0; }
-.btn-yellow-up { background: #facc15; color: #000; border: none; width: 42px; height: 42px; border-radius: 10px; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
-/* КАРТОЧКА С УЛУЧШЕННОЙ 3D АНИМАЦИЕЙ */
-.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: visible; }
-.flip-container { perspective: 1200px; width: 100%; height: 380px; }
+/* КАРТОЧКА С ГАРАНТИРОВАННЫМ ПОВОРОТОМ */
+.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; perspective: 1000px; }
 .flipper { 
-    position: relative; width: 100%; height: 100%; 
-    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-    transform-style: preserve-3d; transform: translateZ(0); /* Пинок для GPU */
+    position: relative; width: 100%; height: 380px; 
+    transition: transform 0.6s; transform-style: preserve-3d; 
 }
-.flipper.flipped { transform: rotateY(180deg) translateZ(0); }
+.flipper.flipped { transform: rotateY(180deg); }
 
 .front, .back { 
     position: absolute; width: 100%; height: 100%; 
     backface-visibility: hidden; -webkit-backface-visibility: hidden;
     display: flex; flex-direction: column; align-items: center; justify-content: center; 
-    background: #1e293b; border-radius: 24px; 
-    border: 2px solid rgba(99, 102, 241, 0.6); padding: 15px; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    background: #1e293b; border-radius: 24px; border: 2px solid #6366f1; padding: 15px; 
 }
 .back { transform: rotateY(180deg); border-color: #4ade80; }
 
+.flash-top { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 8px; flex-shrink:0; }
+.btn-yellow-up { background: #facc15; color: #000; border: none; width: 42px; height: 42px; border-radius: 10px; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
 .side-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.3); border: 1px solid #6366f1; color: white; width: 40px; height: 75px; border-radius: 10px; font-size: 24px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.side-prev { left: -8px; }
-.side-next { right: -8px; }
+.side-prev { left: -5px; }
+.side-next { right: -5px; }
 
 .emoji-box { font-size: 50px; margin-bottom: 5px; }
-.word-main { font-size: 34px; font-weight: 800; text-align: center; line-height: 1.1; }
-.word-sub { font-size: 18px; color: #6366f1; margin-top: 10px; text-align: center; }
+.word-main { font-size: 34px; font-weight: 800; text-align: center; }
+.word-sub { font-size: 18px; color: #6366f1; margin-top: 10px; }
 .btn-voice { background: #1e293b; border: 1px solid #6366f1; color: #6366f1; padding: 10px 20px; border-radius: 50px; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
 
 .btn { background: #6366f1; color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
-.cat-card { background: #1e293b; border-radius: 16px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid #334155; }
+.cat-card { background: #1e293b; border-radius: 16px; padding: 14px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; border: 1px solid #334155; }
 </style>
 </head>
 <body>
@@ -115,7 +109,7 @@ function render() {
         } else {
             for (var i = 0; i < state.availableFiles.length; i++) {
                 var f = state.availableFiles[i];
-                html += '<div class="file-item" onclick="loadFile(\''+f.download_url+'\')"><span style="font-size:20px">📄</span> <span class="file-name">'+f.name+'</span></div>';
+                html += '<div class="file-item" onclick="loadFile(\''+f.download_url+'\')"><span class="file-name">📄 '+f.name+'</span></div>';
             }
         }
         html += '</div></div>';
@@ -131,7 +125,7 @@ function render() {
     } else if (state.screen === 'flash') {
         var w = state.words[state.idx];
         var searchUI = function(side) { return '<div class="search-wrapper" onclick="event.stopPropagation()"><input type="text" id="inp_'+side+'" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(\'inp_'+side+'\')">Искать</button></div>'; };
-        html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr"><div class="flash-top"><button class="btn-yellow-up" onclick="state.screen=\'cats\';render()">▲</button><div style="font-size:18px; font-weight:bold; color:#94a3b8">'+(state.idx+1)+' / '+state.words.length+'</div></div><div class="flash-wrap"><button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button><div class="flip-container"><div id="flipper_card" class="flipper '+(state.isFlipped ? 'flipped' : '')+'" onclick="state.isFlipped=!state.isFlipped; render()"><div class="front">'+searchUI('f')+'<div class="emoji-box">'+w.icon+'</div><button class="btn-voice" onclick="event.stopPropagation(); speak(\''+w.he+'\')">🔊</button><div class="word-main">'+(state.mode==='he' ? w.he : w.tr)+'</div><div class="word-sub">['+w.tr+']</div></div><div class="back">'+searchUI('b')+'<div class="emoji-box">'+w.icon+'</div><div class="word-main" style="color:#4ade80">'+w.ru+'</div></div></div></div><button class="side-nav side-next" onclick="changeIdx(1)">❯</button></div></div>';
+        html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr"><div class="flash-top"><button class="btn-yellow-up" onclick="state.screen=\'cats\';render()">▲</button><div style="font-size:18px; font-weight:bold; color:#94a3b8">'+(state.idx+1)+' / '+state.words.length+'</div></div><div class="flash-wrap"><button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button><div class="flipper '+(state.isFlipped ? 'flipped' : '')+'" onclick="state.isFlipped=!state.isFlipped; render()"><div class="front">'+searchUI('f')+'<div class="emoji-box">'+w.icon+'</div><button class="btn-voice" onclick="event.stopPropagation(); speak(\''+w.he+'\')">🔊</button><div class="word-main">'+(state.mode==='he' ? w.he : w.tr)+'</div><div class="word-sub">['+w.tr+']</div></div><div class="back">'+searchUI('b')+'<div class="emoji-box">'+w.icon+'</div><div class="word-main" style="color:#4ade80">'+w.ru+'</div></div></div><button class="side-nav side-next" onclick="changeIdx(1)">❯</button></div></div>';
     }
     app.innerHTML = html; if (state.screen === 'cats' && state.q) renderSearch();
 }
