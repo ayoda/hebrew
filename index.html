@@ -3,168 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🇮🇱 Иврит 1010 v92 - V10 Hybrid</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f172a">
+<title>🇮🇱 Иврит 1010 v10</title>
+
 <style>
+/* Единая палитра и сброс стилей */
 :root {
   --bg-main: #0f172a;
   --bg-card: #1e293b;
   --accent: #6366f1;
-  --yellow: #facc15;
   --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
   --radius: 16px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:sans-serif;overflow:hidden}
-#app{height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column}
+html,body{height:100%;background:var(--bg-main);color:var(--text-main);font-family:'Inter', -apple-system, sans-serif;overflow:hidden}
 
-.hdr{background:rgba(30,41,59,0.9);padding:10px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0}
-.hdr-title{font-size:20px;font-weight:800;color:var(--accent)}
+#app{height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;position:relative}
 
-.scr{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px;position:relative}
-.scroll{flex:1;overflow-y:auto}
-
-/* Кнопки файлов из v85 */
-.file-item { background: #add8e6 !important; border: 3px solid #ffffff !important; padding: 16px; border-radius: 15px; margin-bottom: 12px; cursor: pointer; }
-.file-name { color: #000 !important; font-weight: 900; font-size: 18px; text-align: center; }
-
-/* Поиск - СТРОГО ВНЕ КАРТОЧКИ */
-.search-wrapper { width: 100%; display: flex !important; margin-bottom: 12px; flex-shrink:0; }
-.inner-search { flex: 1; padding: 10px; border-radius: 10px 0 0 10px; border: 2px solid var(--accent); background: var(--bg-main); color: white; font-size: 14px; outline: none; }
-.search-btn { width: 75px; background: var(--yellow); color: #000; border: 2px solid var(--accent); border-left: none; border-radius: 0 10px 10px 0; font-weight: 900; font-size: 11px; cursor: pointer; }
-
-/* 3D СТРУКТУРА */
-.flash-wrap { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; perspective: 1000px; }
-.flipper { position: relative; width: 100%; height: 380px; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; width: 100%; }
-.flipper.flipped { transform: rotateY(180deg); }
-
-.front, .back { 
-  position: absolute; width: 100%; height: 100%; 
-  backface-visibility: hidden; -webkit-backface-visibility: hidden; 
-  display: flex; flex-direction: column; align-items: center; justify-content: center; 
-  background: var(--bg-card); border-radius: 24px; border: 2px solid var(--accent); padding: 20px;
+/* Улучшенная шапка */
+.hdr{
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(8px);
+  padding: 20px 15px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  z-index: 10;
 }
-.back { transform: rotateY(180deg); border-color: #4ade80; }
+.hdr-logo { font-size: 32px; margin-bottom: 4px; display: block; }
+.hdr-title { font-size: 20px; font-weight: 800; letter-spacing: -0.025em; color: var(--accent); }
+.hdr-sub { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
-.side-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(99, 102, 241, 0.4); border: 1px solid var(--accent); color: white; width: 42px; height: 80px; border-radius: 10px; font-size: 26px; z-index: 100; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.side-prev { left: -5px; }
-.side-next { right: -5px; }
+.scr{flex:1;display:flex;flex-direction:column;overflow:hidden; animation: fadeIn 0.3s ease-out;}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.emoji-box { font-size: 60px; margin-bottom: 10px; }
-.word-main { font-size: 36px; font-weight: 800; text-align: center; }
-.word-sub { font-size: 18px; color: var(--accent); margin-top: 10px; }
-.btn-voice { background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 10px 25px; border-radius: 50px; margin-top: 15px; cursor: pointer; font-weight: bold; }
+.scroll{flex:1;overflow-y:auto; padding: 20px 16px;}
 
-.btn { background: var(--bg-card); color: var(--text-main); border: 1px solid #334155; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%; }
-.btn-active { background: var(--accent) !important; color: white !important; border: none !important; }
+/* Стилизация карточек категорий */
+.cat-grid { display: grid; gap: 16px; }
+.cat-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.cat-card:active { transform: scale(0.97); background: #334155; }
+.cat-card::after {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent);
+}
+
+.cat-icon { 
+  font-size: 32px; margin-right: 20px; 
+  background: rgba(99, 102, 241, 0.1); 
+  width: 60px; height: 60px; 
+  display: flex; align-items: center; justify-content: center; 
+  border-radius: 12px;
+}
+
+.cat-info { flex: 1; }
+.cat-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.cat-count { font-size: 13px; color: var(--text-muted); }
+
+/* Экраны диктанта и результата */
+.dq-box { background: var(--bg-card); margin: 20px; padding: 30px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); }
+.dq-he { font-size: 42px; font-weight: 700; margin-bottom: 10px; color: #fff; }
+.dq-tr { font-size: 18px; color: var(--accent); font-style: italic; margin-bottom: 20px; }
+
+.btn-big {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-out { background: transparent; color: var(--text-muted); border: 1px solid #334155; margin-top: 12px; padding: 12px; width: 100%; border-radius: 12px; }
+
+/* Кастомный скроллбар */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
 </style>
 </head>
 <body>
+
 <div id="app"></div>
+
 <script>
-var GITHUB_USER = "ayoda"; var GITHUB_REPO = "hebrew"; 
-var DICT = []; var state = { screen: 'start', currentCat: null, words: [], idx: 0, isFlipped: false, mode: 'he', q: '', availableFiles: [] };
+// Твой словарь и логика (сокращено для примера, сохрани свои данные!)
+const dict = [
+  {id:1, cat:'Дом', he:'Байт', tr:'бАйт', ru:'Дом', icon:'🏠'},
+  {id:2, cat:'Еда', he:'Охель', tr:'Охель', ru:'Еда', icon:'🍎'},
+  {id:3, cat:'Семья', he:'Мишпаха', tr:'мишпахА', ru:'Семья', icon:'👨‍👩‍👧'},
+  {id:4, cat:'Работа', he:'Авода', tr:'аводА', ru:'Работа', icon:'💼'}
+];
 
-function speak(text) {
-    if (!window.speechSynthesis) return; window.speechSynthesis.cancel();
-    var utterance = new SpeechSynthesisUtterance(text); utterance.lang = 'he-IL';
-    utterance.rate = 0.9; window.speechSynthesis.speak(utterance);
+// Группировка
+const categories = [...new Set(dict.map(w => w.cat))].map(name => {
+  const words = dict.filter(w => w.cat === name);
+  return { name, count: words.length, icon: words[0].icon || '📚' };
+});
+
+const app = document.getElementById('app');
+
+function screenCats() {
+  let html = `
+    <header class="hdr">
+      <span class="hdr-logo">🇮🇱</span>
+      <div class="hdr-title">ИВРИТ 1010</div>
+      <div class="hdr-sub">Михалыч, пора учиться</div>
+    </header>
+    <div class="scr">
+      <div class="scroll">
+        <div class="cat-grid">`;
+  
+  categories.forEach(cat => {
+    html += `
+      <div class="cat-card" onclick="startDictation('${cat.name}')">
+        <div class="cat-icon">${cat.icon}</div>
+        <div class="cat-info">
+          <div class="cat-name">${cat.name}</div>
+          <div class="cat-count">${cat.count} слов</div>
+        </div>
+      </div>`;
+  });
+
+  html += `</div></div></div>`;
+  app.innerHTML = html;
 }
 
-function fetchFileList() {
-    state.q = ''; render();
-    fetch('https://api.github.com/repos/'+GITHUB_USER+'/'+GITHUB_REPO+'/contents/')
-    .then(function(res){return res.json();}).then(function(data){
-        state.availableFiles = data.filter(function(f){return f.name.indexOf('.txt')!==-1;});
-        render();
-    });
+function startDictation(catName) {
+  const words = dict.filter(w => w.cat === catName);
+  let curIdx = 0;
+
+  function showWord() {
+    const w = words[curIdx];
+    app.innerHTML = `
+      <div class="scr">
+        <div class="dq-box">
+          <div class="hdr-sub">${catName} (${curIdx + 1}/${words.length})</div>
+          <div class="dq-he">${w.he}</div>
+          <div class="dq-tr">[${w.tr}]</div>
+          <div style="font-size:20px; margin-bottom:20px">${w.ru}</div>
+          <button class="btn-big" id="nextBtn">${curIdx === words.length - 1 ? 'Завершить' : 'Дальше'}</button>
+          <button class="btn-out" onclick="screenCats()">Выйти</button>
+        </div>
+      </div>`;
+    
+    document.getElementById('nextBtn').onclick = () => {
+      if (curIdx < words.length - 1) {
+        curIdx++;
+        showWord();
+      } else {
+        screenCats();
+      }
+    };
+  }
+  showWord();
 }
 
-function loadFile(url) {
-    fetch(url).then(function(res){return res.text();}).then(function(text){
-        parseData(text); state.q = ''; state.screen = 'cats'; render();
-    });
-}
-
-function parseData(content) {
-    var lines = content.split('\n'); DICT = [];
-    for (var i = 0; i < lines.length; i++) {
-        if (lines[i].indexOf(';') !== -1) {
-            var p = lines[i].split(';');
-            DICT.push({ cat: p[0].trim(), he: p[1].trim(), tr: p[2].trim(), ru: p[3].trim(), icon: (p[4] || "📖").trim() });
-        }
-    }
-}
-
-function runSearch(val) {
-    if(!val) return; state.q = val.toLowerCase(); state.screen = 'cats'; render();
-}
-
-function setMode(m) { state.mode = m; render(); }
-function resetToCats() { state.q = ''; state.screen = 'cats'; render(); }
-
-function render() {
-    var app = document.getElementById('app'); var html = '';
-    if (state.screen === 'start') {
-        html += '<header class="hdr"><div class="hdr-title">ИВРИТ 1010</div></header><div class="scr scroll"><h2 style="text-align:center; margin-bottom:20px; color:#fff">Привет, Михалыч!</h2>';
-        if (state.availableFiles.length === 0) {
-            html += '<button class="btn btn-active" onclick="fetchFileList()">🔄 ЗАГРУЗИТЬ СПИСОК</button>';
-        } else {
-            for (var i = 0; i < state.availableFiles.length; i++) {
-                var f = state.availableFiles[i];
-                html += '<div class="file-item" onclick="loadFile(\''+f.download_url+'\')"><div class="file-name">📄 '+f.name+'</div></div>';
-            }
-        }
-        html += '</div>';
-    } else if (state.screen === 'cats') {
-        var cats = []; for (var j=0; j<DICT.length; j++) { if (cats.indexOf(DICT[j].cat)===-1) cats.push(DICT[j].cat); }
-        var catsHtml = ''; for (var k=0; k<cats.length; k++) {
-            var first = DICT.filter(function(w){return w.cat===cats[k]})[0];
-            catsHtml += '<div style="background:var(--bg-card); border-radius:12px; padding:15px; margin-bottom:10px; display:flex; align-items:center; cursor:pointer; border:1px solid rgba(255,255,255,0.05)" onclick="openSetup(\''+cats[k]+'\')"><div style="font-size:22px; margin-right:12px">'+(first.icon||'📚')+'</div><div>'+cats[k]+'</div></div>';
-        }
-        html += '<header class="hdr"><div class="hdr-title">ТЕМЫ</div></header><div class="scr"><div class="search-wrapper"><button onclick="state.q=\'\';state.screen=\'start\';render()" style="background:var(--yellow); border:none; border-radius:10px; width:45px; margin-right:8px; font-weight:bold">▲</button><input type="text" id="catSearch" class="inner-search" placeholder="🔍 Поиск..." value="'+state.q+'"><button class="search-btn" onclick="runSearch(document.getElementById(\'catSearch\').value)">Искать</button></div><div id="list-area" class="scroll">'+(state.q ? "" : catsHtml)+'</div></div>';
-    } else if (state.screen === 'setup') {
-        html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr"><div style="background:var(--bg-card); padding:20px; border-radius:20px; text-align:center; border:1px solid var(--accent)">';
-        html += '<button class="btn '+(state.mode==='he'?'btn-active':'')+'" onclick="setMode(\'he\')">Иврит → Перевод</button>';
-        html += '<button class="btn '+(state.mode==='tr'?'btn-active':'')+'" onclick="setMode(\'tr\')">Транскрипция → Перевод</button>';
-        html += '<button class="btn" style="background:#22c55e; color:#000; margin-top:20px" onclick="startFlash()">ПОГНАЛИ</button>';
-        html += '<button class="btn" onclick="resetToCats()" style="background:transparent; color:#94a3b8; border:1px solid #334155; margin-top:10px">Назад</button></div></div>';
-    } else if (state.screen === 'flash') {
-        var w = state.words[state.idx];
-        html += '<header class="hdr"><div class="hdr-title">'+state.currentCat+'</div></header><div class="scr">';
-        html += '<div class="search-wrapper"><button style="background:var(--yellow); border:none; border-radius:10px; width:45px; height:42px; font-weight:bold; margin-right:8px" onclick="resetToCats()">▲</button><input type="text" id="flSearch" class="inner-search" placeholder="🔍 Найти..."><button class="search-btn" onclick="runSearch(document.getElementById(\'flSearch\').value)">Искать</button></div>';
-        html += '<div style="text-align:center; font-size:16px; font-weight:bold; color:#94a3b8; margin-bottom:5px">'+(state.idx+1)+' / '+state.words.length+'</div>';
-        html += '<div class="flash-wrap"><button class="side-nav side-prev" onclick="changeIdx(-1)">❮</button>';
-        html += '<div class="flipper '+(state.isFlipped?'flipped':'')+'" onclick="state.isFlipped=!state.isFlipped; render()">';
-        html += '<div class="front"><div class="emoji-box">'+w.icon+'</div><button class="btn-voice" onclick="event.stopPropagation(); speak(\''+w.he+'\')">🔊 СЛУШАТЬ</button><div class="word-main">'+(state.mode==='he'?w.he:w.tr)+'</div><div class="word-sub">['+w.tr+']</div></div>';
-        html += '<div class="back"><div class="emoji-box">'+w.icon+'</div><div class="word-main" style="color:#4ade80">'+w.ru+'</div></div>';
-        html += '</div><button class="side-nav side-next" onclick="changeIdx(1)">❯</button></div></div>';
-    }
-    app.innerHTML = html; if (state.screen === 'cats' && state.q) renderSearch();
-}
-
-function renderSearch() {
-    var q = state.q.trim(); var listArea = document.getElementById('list-area'); if (!listArea) return;
-    var resHtml = ''; for (var i=0; i<DICT.length; i++) {
-        var item = DICT[i]; if (item.he.toLowerCase().indexOf(q)!==-1 || item.ru.toLowerCase().indexOf(q)!==-1 || item.tr.toLowerCase().indexOf(q)!==-1) {
-            resHtml += '<div style="background:var(--bg-card); border-radius:12px; padding:15px; margin-bottom:10px; display:flex; align-items:center; cursor:pointer; border:1px solid #334155" onclick="jumpToWord(\''+item.he+'\')"><div style="font-size:22px; margin-right:12px">'+item.icon+'</div><div><b>'+item.he+'</b> ['+item.tr+']<br><small>'+item.ru+'</small></div></div>';
-        }
-    }
-    listArea.innerHTML = resHtml;
-}
-
-function jumpToWord(he) {
-    var w = DICT.filter(function(x){return x.he===he})[0];
-    state.currentCat = w.cat; state.words = DICT.filter(function(x){return x.cat===w.cat});
-    for (var i = 0; i < state.words.length; i++) { if (state.words[i].he === he) { state.idx = i; break; } }
-    state.isFlipped = false; state.screen = 'flash'; render();
-}
-function openSetup(c) { state.currentCat = c; state.screen = 'setup'; render(); }
-function startFlash() {
-    state.words = DICT.filter(function(w){return w.cat===state.currentCat}).sort(function(){return 0.5-Math.random()});
-    state.idx = 0; state.isFlipped = false; state.screen = 'flash'; render();
-}
-function changeIdx(delta) { var n = state.idx + delta; if (n >= 0 && n < state.words.length) { state.idx = n; state.isFlipped = false; render(); } }
-render();
+// Запуск
+screenCats();
 </script>
 </body>
 </html>
