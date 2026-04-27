@@ -3,7 +3,7 @@
 
     const CONFIG = {
         // Твой боевой адрес в Cloudflare
-        serverUrl: 'wss://falling-dust-3e1e.oleayoda.workers.dev/ws'
+        serverUrl: 'wss://falling-dust-3e1e.oleayoda.workers.dev'
     };
 
     let audioContext, ws, mediaStream, processor;
